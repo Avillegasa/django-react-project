@@ -32,6 +32,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'users',
+    'rest_framework' # Usado para que este incluido la API REST
     'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -82,12 +84,12 @@ WSGI_APPLICATION = 'django_dash_react.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
+        'ENGINE': 'django.db.backends.mysql',
         'NAME': 'django_dash_db',
         'USER': 'avillegas',
         'PASSWORD': '021979',
         'HOST': 'localhost',
-        'PORT': '5432',
+        'PORT': '3306',
     }
 }
 
