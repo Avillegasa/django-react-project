@@ -32,17 +32,20 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'corsheaders',
+    'users',
+
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
+    #'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     "corsheaders.middleware.CorsMiddleware",
@@ -83,13 +86,13 @@ WSGI_APPLICATION = 'django_dash_react.wsgi.application'
 
 DATABASES = {
     # 'default': {
-    #     'ENGINE': 'django.db.backends.postgresql',
+    #     'ENGINE': 'django.db.backends.mysql',
     #     'NAME': 'django_dash_db',
     #     'USER': 'avillegas',
     #     'PASSWORD': '021979',
     #     'HOST': 'localhost',
-    #     'PORT': '5432',
-    #}
+    #     'PORT': '3306',
+    # }
 }
 
 
@@ -137,3 +140,10 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+#Agregamos la conexion de corsheaders para react en este proyecto de Django
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+]

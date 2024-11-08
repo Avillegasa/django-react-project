@@ -22,4 +22,5 @@ urlpatterns = [
     path('', views.index, name = 'index' ), #Carga la vista que renderiza `index.html` de React. Define que cualquier solicitud a la URL raiz del servidor cargara el archivo index.html
     #path('', include('django_dash_react.urls')), # Ajusta segun el nombre de tu aplicacion
     path('admin/', admin.site.urls),
+    path('api/users/', include('users.urls')),
 ]
