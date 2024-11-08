@@ -43,7 +43,9 @@ Navega al directorio principal del proyecto y crea un entorno virtual
 ```
 python3 -m venv env
 source env/bin/activate  # Para Linux/macOS
+
 ```
+# Paso 2.1 ---> IMPORTANTE (Para windows es diferente la creacion y ejecucion del entorno virtual. Deben revisar la respectiva instalacion del entorno virtual)
 
 ## Instalar las dependencias de Python 
 
