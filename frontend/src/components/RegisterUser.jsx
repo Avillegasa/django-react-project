@@ -40,50 +40,62 @@ const RegisterUser = () => {
     };
 
     return (
-        <div>
+        <div className="register-page">
             <div className="register-container">
-            <h2>Register</h2>
-            <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                    <label htmlFor="username">Username</label>
-                    <input
-                        type="text"
-                        name="username"
-                        id="username"
-                        value={formData.username}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="email">Email</label>
-                    <input
-                        type="email"
-                        name="email"
-                        id="email"
-                        value={formData.email}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-                <div className="form-group">
-                    <label htmlFor="password">Password</label>
-                    <input
-                        type="password"
-                        name="password"
-                        id="password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        required
-                    />
-                </div>
-                {error && <p className="error-message">{error}</p>}
-                <button type="submit" className="register-button">Register</button>
-            </form>
+                <h1>Ministerio de Defensa</h1>
+                <p>Sistema de Control, Seguimiento y Análisis Estadístico de Mercancía Incautada por el Viceministerio de Lucha Contra el Contrabando</p>
+                <form onSubmit={handleSubmit}>
+                    <div className="form-group">
+                        <input
+                            type="text"
+                            name="username"
+                            placeholder="Nombre"
+                            value={formData.username}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <input
+                            type="email"
+                            name="email"
+                            placeholder="Correo electrónico"
+                            value={formData.email}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <input
+                            type="password"
+                            name="password"
+                            placeholder="Contraseña"
+                            value={formData.password}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <input
+                            type="text"
+                            name="phone"
+                            placeholder="Celular"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>
+                            <input type="checkbox" required /> Acepta nuestros términos y condiciones
+                        </label>
+                    </div>
+                    {error && <p className="error-message">{error}</p>}
+                    <button type="submit" className="register-button">Regístrate</button>
+                </form>
+                <p className="login-prompt">¿Ya estás registrado? <a href="/login">Iniciar sesión</a></p>
             </div>
         </div>
-        
-        
     );
 };
 
