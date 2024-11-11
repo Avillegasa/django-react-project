@@ -38,9 +38,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'rest_framework',
-    'corsheaders',
     'users',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
 
 ]
 
@@ -144,6 +145,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #Agregamos la conexion de corsheaders para react en este proyecto de Django
 
+#cors authorization
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
 ]
+
+# Inicializacion del Schema
+#REST_FRAMEWORK = {
+#    ...: ...,
+#    "DEFAULT_SCHEMA_CLASS": "rest_framework.schemas.coreapi.AutoSchema",
+#}
