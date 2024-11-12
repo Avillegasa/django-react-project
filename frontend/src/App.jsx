@@ -18,7 +18,6 @@ import SeizurePanel from './modules/Seizure/SeizurePanel';
 function App() {
     return (
         <div className="App">
-            <h1>Sistema de Incautaciones</h1>
             <SeizurePanel />
         </div>
     );
