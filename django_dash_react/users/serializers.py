@@ -4,7 +4,7 @@ from .models import UserProfile
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ['id', 'username', 'email', 'password', 'phone', 'full_name']
+        fields = ['username', 'email', 'password', 'phone', 'full_name', 'role']
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
@@ -17,7 +17,7 @@ class UserProfileSerializer(serializers.ModelSerializer):
         )
         return user
         
-    # def validate_email(self, value):
-    #     if UserProfile.objects.filter(email=value).exists():
-    #         raise serializers.ValidationError("Este correo electrónico ya está en uso.")
-    #     return value
+    def validate_email(self, value):
+        if UserProfile.objects.filter(email=value).exists():
+            raise serializers.ValidationError("Este correo electrónico ya está en uso.")
+        return value
