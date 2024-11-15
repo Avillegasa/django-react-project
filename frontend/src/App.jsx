@@ -33,8 +33,7 @@ function App() {
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<LoginUser />} />
-          <Route path="/register" element={<RegisterUser />} />
-          {/* Public Routes */}
+          {/* Private Routes */}
           <Route path="/dashboard" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/incautaciones" element={<PrivateRoute><Incautaciones /></PrivateRoute>} />
           <Route path="/inventario" element={<PrivateRoute><Inventario /></PrivateRoute>} />

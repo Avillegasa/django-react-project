@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect } from "react";
-import axios from "axios";
+import axios from 'axios';
 
 export const UserContext = createContext();
 
@@ -7,21 +7,18 @@ export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null);
 
     useEffect(() => {
+        // Cargar el token desde localStorage si existe
         const token = localStorage.getItem("userToken");
         if (token) {
-            // Intentar obtener el perfil del usuario usando el token
-            axios.get('http://127.0.0.1:8000/api/users/me/', {
-                headers: {
-                    'Authorization': `Token ${token}`,
-                    'Content-Type': 'application/json'
-                }
+            axios.get("http://127.0.0.1:8000/api/users/me/", {
+                headers: { Authorization: `Token ${token}` },
             })
-            .then((response) => {
-                setUser({ ...response.data, token }); // Almacenar los datos del usuario junto con el token
+            .then(response => {
+                // Almacena el token y el rol devuelto por el backend en el contexto
+                setUser({ token, role: response.data.role });
             })
-            .catch((error) => {
-                console.error("Error fetching user profile:", error);
-                localStorage.removeItem("userToken"); // Remover token si es inválido
+            .catch(error => {
+                console.error("Error fetching user details:", error);
             });
         }
     }, []);

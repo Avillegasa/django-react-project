@@ -59,7 +59,7 @@ class Incinerado(models.Model):
 class Grua(models.Model):
     mercaderia_transportada = models.CharField(max_length=255)
     anio = models.IntegerField()
-    mes = models.CharField(max_length=20)  # Cambiado a CharField
+    mes = models.CharField(max_length=20)
     semana_1 = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     semana_2 = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     semana_3 = models.DecimalField(max_digits=10, decimal_places=2, default=0)

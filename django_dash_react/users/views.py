@@ -15,28 +15,35 @@ User = get_user_model()
 class RegisterUserView(generics.CreateAPIView):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
-
 class LoginUserView(APIView):
     def post(self, request):
         username = request.data.get('username')
         password = request.data.get('password')
 
+        # Validación de campos
         if not username or not password:
             return Response({"error": "Se requieren todos los campos"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Autenticar al usuario
         user = authenticate(username=username, password=password)
         if user is None:
-            return Response({'error': 'Credenciales inválidas'}, status=status.HTTP_400_BAD_REQUEST)
+            # Comprobar si el usuario existe pero la contraseña es incorrecta
+            if UserProfile.objects.filter(username=username).exists():
+                return Response({'error': 'Contraseña incorrecta.'}, status=status.HTTP_400_BAD_REQUEST)
+            else:
+                return Response({'error': 'El usuario no existe.'}, status=status.HTTP_400_BAD_REQUEST)
+        elif not user.is_active:
+            return Response({'error': 'Este usuario está inactivo.'}, status=status.HTTP_403_FORBIDDEN)
 
         # Obtener o crear el token
         try:
             token, created = Token.objects.get_or_create(user=user)
-            return Response({'token': token.key}, status=status.HTTP_200_OK)
+            return Response({'token': token.key, 'role': user.role}, status=status.HTTP_200_OK)
         except Exception as e:
             print("Error al crear o recuperar el token:", e)
             return Response({"error": "Error interno del servidor"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-
+   
+        
 class UserDetailView(APIView):
     permission_classes = [IsAuthenticated]
 

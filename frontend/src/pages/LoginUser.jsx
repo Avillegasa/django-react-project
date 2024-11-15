@@ -1,5 +1,4 @@
-// // src/pages/LoginUser.jsx
-
+// LoginUser.jsx
 import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -22,8 +21,6 @@ const LoginUser = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            console.log("FormData before sending:", formData);
-
             const response = await axios.post(
                 'http://127.0.0.1:8000/api/users/login/',
                 {
@@ -37,18 +34,19 @@ const LoginUser = () => {
                 }
             );
 
-            setUser({ token: response.data.token });  // Guardar token en el contexto de usuario
-            localStorage.setItem("userToken", response.data.token);  // Guardar token en localStorage
+            const { token, role } = response.data;
+            localStorage.setItem("userToken", token);
 
-            navigate('/dashboard');  // Redirigir al dashboard
-            alert('Logged in successfully');
+            // Almacena el token y el rol en el contexto de usuario
+            setUser({ token, role });
+            navigate('/dashboard');
         } catch (error) {
             if (error.response) {
                 console.error("Error response:", error.response);
                 alert(`Login error: ${error.response.data.error}`);
             } else {
                 console.error("Error:", error);
-                alert('Error during login');
+                alert('Error durante el inicio de sesión');
             }
         }
     };
@@ -64,13 +62,10 @@ const LoginUser = () => {
                     <input type="password" name="password" placeholder="Contraseña" value={formData.password} onChange={handleChange} required />
                     <button type="submit">Iniciar sesión</button>
                 </form>
-                <p className="register-prompt">¿Aún no estás registrado? <a href="/register">¡Regístrate!</a></p>
             </div>
             <div className="login-right">
-                <div className="info-text">
-                    <h2>Ministerio de Defensa - Bolivia</h2>
-                    <p>El Decreto Supremo N°3540 establece...</p>
-                </div>
+                <h2>Ministerio de Defensa - Bolivia</h2>
+                <p>El Decreto Supremo N°3540 establece...</p>
             </div>
         </div>
     );
