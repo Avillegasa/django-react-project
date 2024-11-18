@@ -1,48 +1,77 @@
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
-import DefenseLogo from "../assets/images/logo.jpeg";
-import InicioLogo from "../assets/images/casita.svg";
-import IncautacionLogo from "../assets/images/incautaciones.svg";
-import InventarioLogo from "../assets/images/inventario.svg";
-import EstadisticaLogo from "../assets/images/estadisticas.svg";
-import TendenciaLogo from "../assets/images/tendencias.svg";
-import UsuarioLogo from "../assets/images/casita.svg"
+import MinLogo from '../assets/images/mindef.png';
+import LogoInicio from "../assets/icons/inicioicon.svg";
+import LogoInventario from "../assets/icons/invenicon.svg";
+import LogoIncautacion from "../assets/icons/incauicon.svg";
+import LogoTendencia from "../assets/icons/tendenicon.svg";
+import LogoEstadistica from "../assets/icons/estadisicon.svg";
+import LogoUsuario from "../assets/icons/usericon.png";
 
 const Sidebar = () => {
-    
   const { user } = useContext(UserContext);
-  console.log("User data in context:", user);
-
 
   return (
-    <div className="sidebar">
-      <img src={DefenseLogo} alt="Ministerio de Defensa" />
-      <nav>
-        <Link to="/dashboard">
-          <img src={InicioLogo} alt=""/>Inicio
+    <div className="bg-[#2980B9] text-white min-h-screen w-64 flex flex-col items-center py-8">
+      {/* Logo */}
+      <Link to='/dashboard'>
+      <img src={MinLogo} alt="Ministerio de Defensa" className="w-full h-auto mb-0" />
+      </Link>
+      {/* Links de Navegación */}
+      <nav className="w-full flex flex-col items-start px-4 space-y-6">
+        {/* Link Inicio */}
+        <Link
+          to="/dashboard"
+          className="flex items-center space-x-2 text-lg hover:bg-[#2574A9] px-4 py-2 rounded-lg w-full"
+        >
+          <img src={LogoInicio} alt="Inicio" className="w-6 h-6" />
+          <span>Inicio</span>
         </Link>
-        {(user?.role === "Administrador"|| user?.role === 'Operador') && (
-          <Link to="/incautaciones">
-            Incautaciones
+
+        {/* Link Incautaciones */}
+        {(user?.role === "Administrador" || user?.role === "Operador") && (
+          <Link
+            to="/incautaciones"
+            className="flex items-center space-x-2 text-lg hover:bg-[#2574A9] px-4 py-2 rounded-lg w-full"
+          >
+            <img src={LogoIncautacion} alt="Incautaciones" className="w-6 h-6" />
+            <span>Incautaciones</span>
           </Link>
         )}
-        {(user?.role === 'Administrador' || user?.role === 'Operador' || user?.role === 'Analista') && (
-                <>
-        <Link to="/inventario">
-          <img src={InventarioLogo} alt="" />Inventario
-        </Link>
-        <Link to="/estadisticas">
-          <img src={EstadisticaLogo} alt="" />Estadísticas
-        </Link>
-        <Link to="/tendencias">
-          <img src={TendenciaLogo} alt="" />Tendencias
-        </Link>
-        <Link to="/user-details">
-          {" "}
-          <img src={UsuarioLogo} alt="" />Usuario
-        </Link>
-        </>
+
+        {/* Links comunes (Inventario, Estadísticas, Tendencias, Usuario) */}
+        {(user?.role === "Administrador" || user?.role === "Operador" || user?.role === "Analista") && (
+          <>
+            <Link
+              to="/inventario"
+              className="flex items-center space-x-2 text-lg hover:bg-[#2574A9] px-4 py-2 rounded-lg w-full"
+            >
+              <img src={LogoInventario} alt="Inventario" className="w-6 h-6" />
+              <span>Inventario</span>
+            </Link>
+            <Link
+              to="/estadisticas"
+              className="flex items-center space-x-2 text-lg hover:bg-[#2574A9] px-4 py-2 rounded-lg w-full"
+            >
+              <img src={LogoEstadistica} alt="Estadísticas" className="w-6 h-6" />
+              <span>Estadísticas</span>
+            </Link>
+            <Link
+              to="/tendencias"
+              className="flex items-center space-x-2 text-lg hover:bg-[#2574A9] px-4 py-2 rounded-lg w-full"
+            >
+              <img src={LogoTendencia} alt="Tendencias" className="w-6 h-6" />
+              <span>Tendencias</span>
+            </Link>
+            <Link
+              to="/user-details"
+              className="flex items-center space-x-2 text-lg hover:bg-[#2574A9] px-4 py-2 rounded-lg w-full"
+            >
+              <img src={LogoUsuario} alt="Usuario" className="w-6 h-6" />
+              <span>Usuario</span>
+            </Link>
+          </>
         )}
       </nav>
     </div>

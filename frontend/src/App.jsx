@@ -7,7 +7,6 @@ import {
 } from "react-router-dom";
 import UserProvider, { UserContext } from "./contexts/UserContext";
 import LoginUser from "./pages/LoginUser";
-import RegisterUser from "./pages/RegisterUser";
 import Dashboard from "./pages/Dashboard";
 import Incautaciones from "./pages/Incautaciones";
 import Inventario from "./pages/Inventario";
