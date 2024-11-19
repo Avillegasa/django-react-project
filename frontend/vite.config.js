@@ -1,12 +1,21 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import tailwindcss from 'tailwindcss';
+import autoprefixer from 'autoprefixer';
 
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: '/static/' , //Configura la ruta base
-  build: {
-    outDir: '../django_dash_react/static', //Cambia la direccion de salida
-    emptyOutDir: true,
+  // Configuración de base para despliegue
+  // base: '/', //Aca va el dominio en despliegue 
+  server: {
+      open: true, // Abre automaticamente el navegador en la ruta principal 
+  },
+  css: {
+    postcss: {
+      plugins: [
+        tailwindcss(),
+        autoprefixer(),
+      ],
+    },
   },
 });
