@@ -56,16 +56,53 @@ const Incautaciones = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Inicializar todas las semanas con valor "0"
+    const semanasData = {
+      semana_1: 0,
+      semana_2: 0,
+      semana_3: 0,
+      semana_4: 0,
+      semana_5: 0,
+    };
+
+    // Establecer la semana seleccionada con valor "1"
+    semanasData[formData.semana] = 1;
+
+    // Preparar los datos finales para el envío
+    const dataToSend = {
+      anio: parseInt(formData.anio),
+      mes: formData.mes,
+      cantidad: parseFloat(formData.cantidad),
+      ...semanasData,
+    };
+
+    // Agregar campo específico según la categoría
+    switch (formData.categoria) {
+      case "operacion-general":
+        dataToSend["detalle_operacion"] = formData.detalle;
+        break;
+      case "mercaderia":
+        dataToSend["tipo_mercaderia"] = formData.detalle;
+        break;
+      case "vehiculo":
+        dataToSend["tipo_vehiculo"] = formData.detalle;
+        break;
+      case "incinerado":
+        dataToSend["tipo_incinerado"] = formData.detalle;
+        break;
+      case "grua":
+        dataToSend["mercaderia_transportada"] = formData.detalle;
+        break;
+      default:
+        alert("Seleccione una categoría válida.");
+        return;
+    }
+
     try {
       await axios.post(
         `http://127.0.0.1:8000/api/comisos/${formData.categoria}/`,
-        {
-          detalle_operacion: formData.detalle,
-          anio: formData.anio,
-          mes: formData.mes,
-          cantidad: formData.cantidad,
-          [formData.semana]: 1,
-        },
+        dataToSend,
         {
           headers: {
             Authorization: `Token ${user.token}`,
@@ -84,7 +121,7 @@ const Incautaciones = () => {
         cantidad: "",
       });
     } catch (error) {
-      console.error(`Error registrando ${formData.categoria}:`, error);
+      console.error(`Error registrando ${formData.categoria}:`, error.response?.data || error);
       alert(`Error al registrar ${formData.categoria.replace("-", " ")}`);
     }
   };
@@ -145,10 +182,10 @@ const Incautaciones = () => {
                 </select>
               </div>
 
-              {/* Detalle de la operación */}
+              {/* Detalle */}
               <div>
                 <label className="block font-bold text-gray-700">
-                  Detalle de la operación
+                  Detalle
                 </label>
                 <input
                   type="text"
