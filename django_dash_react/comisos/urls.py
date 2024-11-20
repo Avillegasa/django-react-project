@@ -6,6 +6,7 @@ from .views import (
     IncineradoListCreateView,
     GruaListCreateView,
     PredictView,
+    CategoryTrendView,
 )
 
 urlpatterns = [
@@ -15,4 +16,5 @@ urlpatterns = [
     path('api/incinerado/', IncineradoListCreateView.as_view(), name='incinerado'),
     path('api/grua/', GruaListCreateView.as_view(), name='grua'),
     path('api/trends/predict/', PredictView.as_view(), name='predict-data'),
+    path('api/trends/category/', CategoryTrendView.as_view(), name='category-trend'),
 ]

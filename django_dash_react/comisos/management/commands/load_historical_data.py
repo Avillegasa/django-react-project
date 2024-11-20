@@ -44,12 +44,16 @@ class Command(BaseCommand):
                 ]
 
                 # Validar campos necesarios
-                if not anio or not mes or cantidad is None:
+                if not anio or not mes:
                     self.stdout.write(self.style.WARNING(
                         f"Ignorando registro en {category}: {record.id} - Datos faltantes: "
-                        f"anio={anio}, mes={mes}, cantidad={cantidad}"
+                        f"anio={anio}, mes={mes}"
                     ))
                     continue
+
+                # Calcular cantidad si está vacía
+                if not cantidad or cantidad == 0:
+                    cantidad = sum(semanas)
 
                 month_number = MONTH_MAPPING.get(mes, "01")
                 date = f"{anio}-{month_number}-01"
