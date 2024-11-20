@@ -1,4 +1,5 @@
 from django.db import models
+from .analytics_models import HistoricalData, Prediction
 
 class OperacionGeneral(models.Model):
     detalle_operacion = models.CharField(max_length=255)

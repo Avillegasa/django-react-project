@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-/*import React from 'react';
-import RegisterUser from './components/RegisterUser.jsx';
-=======
 import React, { useContext } from "react";
 import {
   BrowserRouter as Router,
@@ -26,7 +22,6 @@ const PrivateRoute = ({ children }) => {
     return user ? children : <Navigate to="/" />;
 };
 
->>>>>>> 85d19f319c5400645319466fc2cca74c403dfd63
 
 function App() {
  
@@ -54,22 +49,6 @@ function App() {
 }
 
 export default App;
-<<<<<<< HEAD
-*/
-// App.jsx// App.jsx
-import React from 'react';
-import SeizurePanel from './modules/Seizure/SeizurePanel';
-
-function App() {
-    return (
-        <div className="App">
-            <SeizurePanel />
-        </div>
-    );
-}
-
-export default App;
-=======
 
 
 
@@ -120,4 +99,3 @@ export default App;
 // }
 
 // export default App;
->>>>>>> 85d19f319c5400645319466fc2cca74c403dfd63

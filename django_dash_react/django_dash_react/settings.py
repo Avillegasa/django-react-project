@@ -95,14 +95,14 @@ WSGI_APPLICATION = 'django_dash_react.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'NAME': 'django_dash_db',
-    #     'USER': 'avillegas',
-    #     'PASSWORD': '021979',
-    #     'HOST': 'localhost',
-    #     'PORT': '3306',
-    # }
+     'default': {
+         'ENGINE': 'django.db.backends.mysql',
+         'NAME': 'django_dash_db',
+         'USER': 'avillegas',
+         'PASSWORD': '021979',
+         'HOST': 'localhost',
+         'PORT': '3306',
+     }
 }
 
 
