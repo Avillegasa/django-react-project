@@ -4,7 +4,6 @@ from comisos.models import (
 )
 from comisos.analytics_models import HistoricalData
 
-# Mapeo de meses en formato numérico
 MONTH_MAPPING = {
     "Enero": "01", "Febrero": "02", "Marzo": "03", "Abril": "04",
     "Mayo": "05", "Junio": "06", "Julio": "07", "Agosto": "08",
@@ -12,65 +11,57 @@ MONTH_MAPPING = {
 }
 
 class Command(BaseCommand):
-    help = 'Cargar datos históricos desde las tablas específicas'
+    help = 'Cargar datos históricos desde las tablas comisos_*'
 
     def handle(self, *args, **kwargs):
-        # Limpieza previa de la tabla HistoricalData (opcional)
+        # Limpieza de la tabla HistoricalData
         HistoricalData.objects.all().delete()
+        self.stdout.write(self.style.WARNING("Se eliminaron los datos existentes en HistoricalData."))
 
-        # Procesar comisos_operaciongeneral
-        for record in OperacionGeneral.objects.all():
-            month_number = MONTH_MAPPING.get(record.mes, "01")
-            HistoricalData.objects.create(
-                category="Operaciones Generales",
-                date=f"{record.anio}-{month_number}-01",
-                region=getattr(record, 'region', "Sin definir"),
-                quantity=record.cantidad,
-                value=record.semana_1 + record.semana_2 + record.semana_3 + record.semana_4 + record.semana_5
-            )
+        # Mapear categorías a modelos
+        models_mapping = {
+            "Operaciones Generales": OperacionGeneral,
+            "Mercadería": Mercaderia,
+            "Vehículos": Vehiculo,
+            "Incinerados": Incinerado,
+            "Grúas": Grua,
+        }
 
-        # Procesar comisos_mercaderia
-        for record in Mercaderia.objects.all():
-            month_number = MONTH_MAPPING.get(record.mes, "01")
-            HistoricalData.objects.create(
-                category="Mercadería",
-                date=f"{record.anio}-{month_number}-01",
-                region=getattr(record, 'region', "Sin definir"),
-                quantity=record.cantidad,
-                value=record.semana_1 + record.semana_2 + record.semana_3 + record.semana_4 + record.semana_5
-            )
+        for category, model in models_mapping.items():
+            self.process_model(model, category)
 
-        # Procesar comisos_vehiculo
-        for record in Vehiculo.objects.all():
-            month_number = MONTH_MAPPING.get(record.mes, "01")
-            HistoricalData.objects.create(
-                category="Vehículos",
-                date=f"{record.anio}-{month_number}-01",
-                region=getattr(record, 'region', "Sin definir"),
-                quantity=record.cantidad,
-                value=record.semana_1 + record.semana_2 + record.semana_3 + record.semana_4 + record.semana_5
-            )
+        self.stdout.write(self.style.SUCCESS("Datos históricos cargados exitosamente."))
 
-        # Procesar comisos_incinerado
-        for record in Incinerado.objects.all():
-            month_number = MONTH_MAPPING.get(record.mes, "01")
-            HistoricalData.objects.create(
-                category="Incinerados",
-                date=f"{record.anio}-{month_number}-01",
-                region=getattr(record, 'region', "Sin definir"),
-                quantity=record.cantidad,
-                value=record.semana_1 + record.semana_2 + record.semana_3 + record.semana_4 + record.semana_5
-            )
+    def process_model(self, model, category):
+        records = model.objects.all()
+        for record in records:
+            try:
+                anio = record.anio
+                mes = record.mes
+                cantidad = record.cantidad
+                semanas = [
+                    getattr(record, f'semana_{i}', 0) or 0 for i in range(1, 6)
+                ]
 
-        # Procesar comisos_grua
-        for record in Grua.objects.all():
-            month_number = MONTH_MAPPING.get(record.mes, "01")
-            HistoricalData.objects.create(
-                category="Grúas",
-                date=f"{record.anio}-{month_number}-01",
-                region=getattr(record, 'region', "Sin definir"),
-                quantity=record.cantidad,
-                value=record.semana_1 + record.semana_2 + record.semana_3 + record.semana_4 + record.semana_5
-            )
+                # Validar campos necesarios
+                if not anio or not mes or cantidad is None:
+                    self.stdout.write(self.style.WARNING(
+                        f"Ignorando registro en {category}: {record.id} - Datos faltantes: "
+                        f"anio={anio}, mes={mes}, cantidad={cantidad}"
+                    ))
+                    continue
 
-        self.stdout.write(self.style.SUCCESS('Datos históricos cargados exitosamente desde las tablas especificadas.'))
+                month_number = MONTH_MAPPING.get(mes, "01")
+                date = f"{anio}-{month_number}-01"
+                value = sum(semanas)
+
+                # Crear el registro
+                HistoricalData.objects.create(
+                    category=category,
+                    date=date,
+                    quantity=cantidad,
+                    value=value,
+                    source=model._meta.db_table  # Nombre de la tabla fuente
+                )
+            except Exception as e:
+                self.stdout.write(self.style.ERROR(f"Error procesando {category}: {e}"))
