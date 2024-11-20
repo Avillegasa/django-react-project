@@ -4,6 +4,7 @@ from comisos.models import (
 )
 from comisos.analytics_models import HistoricalData
 
+# Mapeo de meses a números
 MONTH_MAPPING = {
     "Enero": "01", "Febrero": "02", "Marzo": "03", "Abril": "04",
     "Mayo": "05", "Junio": "06", "Julio": "07", "Agosto": "08",
@@ -18,7 +19,7 @@ class Command(BaseCommand):
         HistoricalData.objects.all().delete()
         self.stdout.write(self.style.WARNING("Se eliminaron los datos existentes en HistoricalData."))
 
-        # Mapear categorías a modelos
+        # Mapeo de categorías a modelos
         models_mapping = {
             "Operaciones Generales": OperacionGeneral,
             "Mercadería": Mercaderia,
@@ -43,7 +44,7 @@ class Command(BaseCommand):
                     getattr(record, f'semana_{i}', 0) or 0 for i in range(1, 6)
                 ]
 
-                # Validar campos necesarios
+                # Validar campos obligatorios
                 if not anio or not mes:
                     self.stdout.write(self.style.WARNING(
                         f"Ignorando registro en {category}: {record.id} - Datos faltantes: "
@@ -51,15 +52,25 @@ class Command(BaseCommand):
                     ))
                     continue
 
-                # Calcular cantidad si está vacía
+                # Convertir mes a formato numérico
+                month_number = MONTH_MAPPING.get(mes.capitalize(), None)
+                if not month_number:
+                    self.stdout.write(self.style.WARNING(
+                        f"Ignorando registro en {category}: {record.id} - Mes inválido: {mes}"
+                    ))
+                    continue
+
+                # Generar fecha
+                date = f"{anio}-{month_number}-01"
+
+                # Calcular cantidad si no existe
                 if not cantidad or cantidad == 0:
                     cantidad = sum(semanas)
 
-                month_number = MONTH_MAPPING.get(mes, "01")
-                date = f"{anio}-{month_number}-01"
+                # Calcular valor total
                 value = sum(semanas)
 
-                # Crear el registro
+                # Crear registro en HistoricalData
                 HistoricalData.objects.create(
                     category=category,
                     date=date,
