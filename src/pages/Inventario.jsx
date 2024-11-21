@@ -1,10 +1,67 @@
-import React, { useContext } from "react";
+import React, { useContext, useState, useEffect } from "react";
 import { Navigate } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
 import Sidebar from "../components/Sidebar";
 
 const Inventario = () => {
   const { user } = useContext(UserContext);
+  const [data, setData] = useState([]); // Para almacenar los datos de la API
+  const [loading, setLoading] = useState(false); // Para mostrar el estado de carga
+  const [filters, setFilters] = useState({
+    categoria: "",
+    semana: "",
+    mes: "",
+    anio: "",
+  });
+
+  // Función para manejar los cambios en los filtros
+  const handleFilterChange = (e) => {
+    setFilters({
+      ...filters,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  // Función para buscar los registros
+  const handleSearch = async () => {
+    setLoading(true);
+    try {
+      console.log("Realizando solicitud a la API...");
+      const response = await fetch("http://127.0.0.1:8000/api/comisos/", {
+        method: "GET",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Token ${user.token}`,
+        },
+      });
+
+      const result = await response.json();
+      console.log("Datos recuperados de la API:", result);
+
+      // Filtrar datos según los filtros seleccionados
+      const filteredData = result.filter((item) => {
+        const categoriaMatch =
+          !filters.categoria || item.categoria === filters.categoria;
+        const semanaMatch = !filters.semana || item.semana === filters.semana;
+        const mesMatch = !filters.mes || item.mes === filters.mes;
+        const anioMatch = !filters.anio || item.anio === Number(filters.anio);
+
+        // Mostrar log de cada filtro
+        console.log("Filtro por categoría:", categoriaMatch);
+        console.log("Filtro por semana:", semanaMatch);
+        console.log("Filtro por mes:", mesMatch);
+        console.log("Filtro por año:", anioMatch);
+
+        return categoriaMatch && semanaMatch && mesMatch && anioMatch;
+      });
+
+      console.log("Datos filtrados:", filteredData);
+      setData(filteredData);
+    } catch (error) {
+      console.error("Error al realizar la solicitud a la API:", error);
+    }
+    setLoading(false);
+  };
 
   // Redirige al login si no hay un usuario autenticado
   if (!user) {
@@ -21,9 +78,7 @@ const Inventario = () => {
         {/* Barra Superior */}
         <div className="bg-[#ECF0F1] border-b border-gray-300 flex items-center justify-between px-6 py-3">
           {/* Título SICOSE */}
-          <h1 className="text-xl tracking-[0.5em] font-bold text-black">
-            SICOSE
-          </h1>
+          <h1 className="text-xl tracking-[0.5em] font-bold text-black">SICOSE</h1>
 
           {/* Ícono de Usuario */}
           <img
@@ -44,72 +99,97 @@ const Inventario = () => {
 
           {/* Barra de Filtros */}
           <div className="bg-gray-100 shadow-md rounded-lg p-4 w-full max-w-7xl mb-4">
-            <div className="grid grid-cols-4 gap-0">
+            <div className="grid grid-cols-5 gap-4">
               {/* Categoría */}
-              <div className="col-span-1 px-6">
+              <div>
                 <label className="block text-sm font-semibold text-gray-700">
                   Categoría
                 </label>
-                <select className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#3498DB]">
-                  <option>Seleccione una categoría</option>
-                  <option>Operación General</option>
-                  <option>Mercadería</option>
-                  <option>Víctimas</option>
-                  <option>Incinerado</option>
-                  <option>Grúa</option>
+                <select
+                  name="categoria"
+                  value={filters.categoria}
+                  onChange={handleFilterChange}
+                  className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#3498DB]"
+                >
+                  <option value="">Seleccione una categoría</option>
+                  <option value="Operación General">Operación General</option>
+                  <option value="Mercadería">Mercadería</option>
+                  <option value="Víctimas">Víctimas</option>
+                  <option value="Incinerado">Incinerado</option>
+                  <option value="Grúa">Grúa</option>
                 </select>
               </div>
 
               {/* Semana */}
-              <div className="col-span-1 px-6">
+              <div>
                 <label className="block text-sm font-semibold text-gray-700">
                   Semana
                 </label>
-                <select className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#3498DB]">
-                  <option>Seleccione una semana</option>
-                  <option>Semana 1</option>
-                  <option>Semana 2</option>
-                  <option>Semana 3</option>
-                  <option>Semana 4</option>
-                  <option>Semana 5</option>
+                <select
+                  name="semana"
+                  value={filters.semana}
+                  onChange={handleFilterChange}
+                  className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#3498DB]"
+                >
+                  <option value="">Seleccione una semana</option>
+                  <option value="Semana 1">Semana 1</option>
+                  <option value="Semana 2">Semana 2</option>
+                  <option value="Semana 3">Semana 3</option>
+                  <option value="Semana 4">Semana 4</option>
+                  <option value="Semana 5">Semana 5</option>
                 </select>
               </div>
 
               {/* Mes */}
-              <div className="col-span-1 px-6">
+              <div>
                 <label className="block text-sm font-semibold text-gray-700">
                   Mes
                 </label>
-                <select className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#3498DB]">
-                  <option>Seleccione un mes</option>
-                  <option>Enero</option>
-                  <option>Febrero</option>
-                  <option>Marzo</option>
-                  <option>Abril</option>
-                  <option>Mayo</option>
-                  <option>Junio</option>
-                  <option>Julio</option>
-                  <option>Agosto</option>
-                  <option>Septiembre</option>
-                  <option>Octubre</option>
-                  <option>Noviembre</option>
-                  <option>Diciembre</option>
+                <select
+                  name="mes"
+                  value={filters.mes}
+                  onChange={handleFilterChange}
+                  className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#3498DB]"
+                >
+                  <option value="">Seleccione un mes</option>
+                  <option value="Enero">Enero</option>
+                  <option value="Febrero">Febrero</option>
+                  <option value="Marzo">Marzo</option>
+                  <option value="Abril">Abril</option>
+                  <option value="Mayo">Mayo</option>
+                  <option value="Junio">Junio</option>
+                  <option value="Julio">Julio</option>
+                  <option value="Agosto">Agosto</option>
+                  <option value="Septiembre">Septiembre</option>
+                  <option value="Octubre">Octubre</option>
+                  <option value="Noviembre">Noviembre</option>
+                  <option value="Diciembre">Diciembre</option>
                 </select>
               </div>
 
               {/* Año */}
-              <div className="col-span-1 px-6">
+              <div>
                 <label className="block text-sm font-semibold text-gray-700">
                   Año
                 </label>
-                <select className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#3498DB]">
-                  <option>Seleccione un año</option>
-                  <option>2020</option>
-                  <option>2021</option>
-                  <option>2022</option>
-                  <option>2023</option>
-                  <option>2024</option>
-                </select>
+                <input
+                  type="number"
+                  name="anio"
+                  value={filters.anio}
+                  onChange={handleFilterChange}
+                  placeholder="Ingrese un año"
+                  className="w-full p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-[#3498DB]"
+                />
+              </div>
+
+              {/* Botón Buscar */}
+              <div className="flex items-end">
+                <button
+                  onClick={handleSearch}
+                  className="bg-[#2980B9] text-white px-4 py-2 rounded-lg hover:bg-[#1F618D]"
+                >
+                  Buscar
+                </button>
               </div>
             </div>
           </div>
@@ -117,62 +197,32 @@ const Inventario = () => {
           {/* Tabla */}
           <div className="bg-white shadow-lg rounded-lg overflow-hidden w-full max-w-7xl">
             <div className="overflow-x-auto">
-              <table className="table-auto w-full text-left border-collapse">
-                <thead className="bg-gray-100 text-gray-700">
-                  <tr>
-                    <th className="px-6 py-4 border-b">Categoría</th>
-                    <th className="px-6 py-4 border-b">Semana</th>
-                    <th className="px-6 py-4 border-b">Mes</th>
-                    <th className="px-6 py-4 border-b">Año</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {[
-                    { categoria: "Operación General", semana: "Semana 1", mes: "Enero", año: 2022, color: "text-green-600" },
-                    { categoria: "Mercadería", semana: "Semana 3", mes: "Febrero", año: 2022, color: "text-green-600" },
-                    { categoria: "Víctimas", semana: "Semana 2", mes: "Marzo", año: 2023, color: "text-yellow-600" },
-                    { categoria: "Incinerado", semana: "Semana 4", mes: "Abril", año: 2023, color: "text-yellow-600" },
-                    { categoria: "Grúa", semana: "Semana 1", mes: "Mayo", año: 2023, color: "text-yellow-600" },
-                    { categoria: "Operación General", semana: "Semana 3", mes: "Junio", año: 2022, color: "text-green-600" },
-                    { categoria: "Mercadería", semana: "Semana 2", mes: "Julio", año: 2023, color: "text-yellow-600" },
-                    { categoria: "Víctimas", semana: "Semana 4", mes: "Agosto", año: 2024, color: "text-red-600" },
-                    { categoria: "Incinerado", semana: "Semana 1", mes: "Septiembre", año: 2024, color: "text-red-600" },
-                    { categoria: "Grúa", semana: "Semana 3", mes: "Octubre", año: 2024, color: "text-red-600" },
-                  ].map((row, index) => (
-                    <tr key={index}>
-                      <td className="px-6 py-4 border-t">{row.categoria}</td>
-                      <td className="px-6 py-4 border-t">{row.semana}</td>
-                      <td className="px-6 py-4 border-t">{row.mes}</td>
-                      <td className={`px-6 py-4 border-t ${row.color}`}>{row.año}</td>
+              {loading ? (
+                <div className="text-center py-4">Cargando...</div>
+              ) : data.length > 0 ? (
+                <table className="table-auto w-full text-left border-collapse">
+                  <thead className="bg-gray-100 text-gray-700">
+                    <tr>
+                      <th className="px-6 py-4 border-b">Categoría</th>
+                      <th className="px-6 py-4 border-b">Semana</th>
+                      <th className="px-6 py-4 border-b">Mes</th>
+                      <th className="px-6 py-4 border-b">Año</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-
-            {/* Paginación */}
-            <div className="flex justify-between items-center mt-4">
-              <span className="text-gray-600">Mostrando 1 a 10 de 430 entradas</span>
-              <div className="flex items-center gap-2">
-                <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">
-                  &lt;
-                </button>
-                <button className="bg-[#3498DB] text-white px-4 py-2 rounded-md">
-                  1
-                </button>
-                <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">
-                  2
-                </button>
-                <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">
-                  3
-                </button>
-                <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">
-                  ...
-                </button>
-                <button className="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">
-                  &gt;
-                </button>
-              </div>
+                  </thead>
+                  <tbody>
+                    {data.map((item, index) => (
+                      <tr key={index}>
+                        <td className="px-6 py-4 border-t">{item.categoria}</td>
+                        <td className="px-6 py-4 border-t">{item.semana}</td>
+                        <td className="px-6 py-4 border-t">{item.mes}</td>
+                        <td className="px-6 py-4 border-t">{item.anio}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              ) : (
+                <div className="text-center py-4">No se encontraron resultados.</div>
+              )}
             </div>
           </div>
         </div>

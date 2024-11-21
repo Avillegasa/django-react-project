@@ -249,3 +249,4 @@ const Incautaciones = () => {
 };
 
 export default Incautaciones;
+
