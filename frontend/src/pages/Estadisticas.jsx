@@ -11,6 +11,7 @@ const Estadisticas = () => {
     const { user } = useContext(UserContext);
     const [comisos, setComisos] = useState({});
     const [anio, setAnio] = useState(new Date().getFullYear());
+    const [mes, setMes] = useState("Enero");
     const [allData, setAllData] = useState({});
 
     // Obtener datos del backend
@@ -46,6 +47,10 @@ const Estadisticas = () => {
         const selectedYear = parseInt(e.target.value);
         setAnio(selectedYear);
         filterDataByYear(allData, selectedYear);
+    };
+
+    const handleMonthChange = (e) => {
+        setMes(e.target.value);
     };
 
     if (!user) {
@@ -84,17 +89,18 @@ const Estadisticas = () => {
         })),
     };
 
-    // Datos para la segunda gráfica (barras agrupadas por semanas)
+    // Datos para la segunda gráfica (barras agrupadas por semanas para el mes seleccionado)
     const barData = {
         labels: ["Semana 1", "Semana 2", "Semana 3", "Semana 4", "Semana 5"],
         datasets: categorias.map((categoria, index) => ({
             label: categoria.replace("_", " ").toUpperCase(),
             data: [1, 2, 3, 4, 5].map((semana) => {
-                // Sumamos las cantidades correspondientes a la semana
                 const total = comisos[categoria]?.reduce((acc, item) => {
-                    const key = `semana_${semana}`; // Clave dinámica para semana
-                    if (item[key] !== undefined) {
-                        return acc + parseFloat(item[key] || 0);
+                    if (item.mes?.toLowerCase() === mes.toLowerCase()) {
+                        const key = `semana_${semana}`;
+                        if (item[key] !== undefined) {
+                            return acc + parseFloat(item[key] || 0);
+                        }
                     }
                     return acc;
                 }, 0);
@@ -143,7 +149,7 @@ const Estadisticas = () => {
                 {/* Main Content */}
                 <div className="flex flex-col items-center justify-start flex-1 p-8 bg-gray-100">
                     <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-7xl">
-                        <h2 className="text-3xl font-bold mb-6 text-center">Reportes Estadísticos</h2>
+                        <h2 className="text-3xl font-bold mb-6 text-center">ESTADÍSTICAS GRÁFICAS</h2>
 
                         {/* Año Selector */}
                         <div className="mb-6 flex justify-end">
@@ -162,6 +168,19 @@ const Estadisticas = () => {
                                 ))}
                             </select>
                         </div>
+                        
+                        {/* Textos explicativos de categorías */}
+                        <div className="mb-6 bg-gray-100 p-4 rounded-lg border border-gray-300">
+                            <h3 className="text-lg font-semibold text-gray-800">SOBRE LAS CATEGORÍAS:</h3>
+                            <ul className="list-disc list-inside text-gray-700 mt-2">
+                                <li><span className="font-bold text-gray-800">OPERACIÓN GENERAL:</span> Son aquellas operaciones llevadas a cabo por las distintas unidades operativas con las que cuenta el Viceministerio de Lucha Contra el Contrabando (Patrullajes móviles, Patrullajes a Pie, Evacuaciones, Enfrentamientos con contrabandistas y demas similares).</li>
+                                <li><span className="font-bold text-gray-800">MERCADERÍA:</span> Se refiere a aquellos productos comisados en las distintas operaciones (comestibles, enlatados, equipos electronicos, carburantes, divisas, sustancias controladas, etc).</li>
+                                <li><span className="font-bold text-gray-800">VEHÍCULO:</span> Vehiculos comisados con distintas caracteristicas (pesados, livianos, medianos, motocicletas, embarcaciones)</li>
+                                <li><span className="font-bold text-gray-800">INCINERADO:</span> Vehiculos comisados con distintas caracteristicas los cuales por algun motivo requerian ser incinerados</li>
+                                <li><span className="font-bold text-gray-800">GRIA:</span> Se refiere a los comisos realizados por los Grupos de Reacción Inmediata.</li>
+                                {/* Agrega más categorías si es necesario */}
+                            </ul>
+                        </div>
 
                         {/* Primera Gráfica */}
                         {Object.keys(comisos).length === 0 ? (
@@ -177,9 +196,28 @@ const Estadisticas = () => {
                 {/* Segunda Gráfica */}
                 <div className="flex flex-col items-center justify-start flex-1 p-8 bg-gray-100">
                     <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-7xl">
-                        <h2 className="text-3xl font-bold mb-6 text-center">Valores Semanales por Categoría</h2>
+                        <h2 className="text-xl font-bold mb-6 text-center">Valores Semanales por Categoría de la gestion seleccionada</h2>
+
+                        {/* Mes Selector */}
+                        <div className="mb-6 flex justify-end">
+                            <label className="mr-4 font-semibold text-gray-700 text-lg">
+                                Mes:
+                            </label>
+                            <select
+                                value={mes}
+                                onChange={handleMonthChange}
+                                className="p-3 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            >
+                                {meses.map((month, index) => (
+                                    <option key={index} value={month}>
+                                        {month}
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+
                         {Object.keys(comisos).length === 0 ? (
-                            <p className="text-center text-lg text-gray-500">No hay datos disponibles para el año seleccionado.</p>
+                            <p className="text-center text-lg text-gray-500">No hay datos disponibles para el mes seleccionado.</p>
                         ) : (
                             <div className="bg-white p-6 rounded-lg shadow-lg w-full h-[500px]">
                                 <Bar data={barData} options={options} height={500} />

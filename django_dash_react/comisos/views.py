@@ -1,3 +1,4 @@
+from rest_framework import generics
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -10,6 +11,7 @@ from .serializers import (
     GruaSerializer
 )
 
+# Vista basada en función para obtener todos los comisos
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_all_comisos(request):
@@ -29,3 +31,38 @@ def get_all_comisos(request):
         "incinerado": incinerado,
         "grua": grua,
     })
+
+
+# Vista basada en clases para OperacionGeneral
+class OperacionGeneralListCreateView(generics.ListCreateAPIView):
+    queryset = OperacionGeneral.objects.all()
+    serializer_class = OperacionGeneralSerializer
+    permission_classes = [IsAuthenticated]
+
+
+# Vista basada en clases para Mercaderia
+class MercaderiaListCreateView(generics.ListCreateAPIView):
+    queryset = Mercaderia.objects.all()
+    serializer_class = MercaderiaSerializer
+    permission_classes = [IsAuthenticated]
+
+
+# Vista basada en clases para Vehiculo
+class VehiculoListCreateView(generics.ListCreateAPIView):
+    queryset = Vehiculo.objects.all()
+    serializer_class = VehiculoSerializer
+    permission_classes = [IsAuthenticated]
+
+
+# Vista basada en clases para Incinerado
+class IncineradoListCreateView(generics.ListCreateAPIView):
+    queryset = Incinerado.objects.all()
+    serializer_class = IncineradoSerializer
+    permission_classes = [IsAuthenticated]
+
+
+# Vista basada en clases para Grua
+class GruaListCreateView(generics.ListCreateAPIView):
+    queryset = Grua.objects.all()
+    serializer_class = GruaSerializer
+    permission_classes = [IsAuthenticated]
