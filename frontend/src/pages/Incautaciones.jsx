@@ -56,16 +56,35 @@ const Incautaciones = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Crear objeto base con campos comunes
+    const dataToSend = {
+      anio: parseInt(formData.anio),
+      mes: formData.mes,
+      semana: formData.semana.replace("semana_", ""), // Convertir a número
+      cantidad: parseInt(formData.cantidad),
+      detalle: formData.detalle,
+      categoria: formData.categoria,
+    };
+
+    // Adaptar "detalle" según la categoría seleccionada
+    if (formData.categoria === "mercaderia") {
+      dataToSend.tipo_mercaderia = formData.detalle; // Campo específico para Mercadería
+    } else if (formData.categoria === "vehiculo") {
+      dataToSend.tipo_vehiculo = formData.detalle; // Campo específico para Vehículo
+    } else if (formData.categoria === "incinerado") {
+      dataToSend.tipo_incinerado = formData.detalle; // Campo específico para Incinerado
+    } else if (formData.categoria === "grua") {
+      dataToSend.mercaderia_transportada = formData.detalle; // Campo específico para Grúa
+    } else {
+      dataToSend.detalle_operacion = formData.detalle; // Campo específico para Operación General
+    }
+
+
     try {
       await axios.post(
         `http://127.0.0.1:8000/api/comisos/${formData.categoria}/`,
-        {
-          detalle_operacion: formData.detalle,
-          anio: formData.anio,
-          mes: formData.mes,
-          cantidad: formData.cantidad,
-          [formData.semana]: 1,
-        },
+        dataToSend,
         {
           headers: {
             Authorization: `Token ${user.token}`,

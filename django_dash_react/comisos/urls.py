@@ -4,7 +4,8 @@ from .views import (
     MercaderiaListCreateView,
     VehiculoListCreateView,
     IncineradoListCreateView,
-    GruaListCreateView
+    GruaListCreateView,
+    get_all_comisos,  # Nueva vista importada
 )
 
 urlpatterns = [
@@ -13,4 +14,6 @@ urlpatterns = [
     path('vehiculo/', VehiculoListCreateView.as_view(), name='vehiculo-list-create'),
     path('incinerado/', IncineradoListCreateView.as_view(), name='incinerado-list-create'),
     path('grua/', GruaListCreateView.as_view(), name='grua-list-create'),
+    # Nueva ruta para obtener todos los datos
+    path('all-comisos/', get_all_comisos, name='all-comisos'),
 ]

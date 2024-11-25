@@ -4,7 +4,7 @@ from .models import OperacionGeneral, Mercaderia, Vehiculo, Incinerado, Grua
 class OperacionGeneralSerializer(serializers.ModelSerializer):
     class Meta:
         model = OperacionGeneral
-        fields = '__all__'  # O especifica los campos que deseas incluir
+        fields = '__all__'
 
 class MercaderiaSerializer(serializers.ModelSerializer):
     class Meta:
