@@ -5,6 +5,9 @@ import autoprefixer from 'autoprefixer';
 
 export default defineConfig({
   plugins: [react()],
+  build: {
+    outDir: '../django_dash_react/static',  // Carpeta de salida para Django
+  },
   // Configuración de base para despliegue
   // base: '/', //Aca va el dominio en despliegue 
   server: {

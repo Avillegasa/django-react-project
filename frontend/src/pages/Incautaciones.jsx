@@ -57,47 +57,29 @@ const Incautaciones = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Inicializar todas las semanas con valor "0"
-    const semanasData = {
-      semana_1: 0,
-      semana_2: 0,
-      semana_3: 0,
-      semana_4: 0,
-      semana_5: 0,
-    };
-
-    // Establecer la semana seleccionada con valor "1"
-    semanasData[formData.semana] = 1;
-
-    // Preparar los datos finales para el envío
+    // Crear objeto base con campos comunes
     const dataToSend = {
       anio: parseInt(formData.anio),
       mes: formData.mes,
-      cantidad: parseFloat(formData.cantidad),
-      ...semanasData,
+      semana: formData.semana.replace("semana_", ""), // Convertir a número
+      cantidad: parseInt(formData.cantidad),
+      detalle: formData.detalle,
+      categoria: formData.categoria,
     };
 
-    // Agregar campo específico según la categoría
-    switch (formData.categoria) {
-      case "operacion-general":
-        dataToSend["detalle_operacion"] = formData.detalle;
-        break;
-      case "mercaderia":
-        dataToSend["tipo_mercaderia"] = formData.detalle;
-        break;
-      case "vehiculo":
-        dataToSend["tipo_vehiculo"] = formData.detalle;
-        break;
-      case "incinerado":
-        dataToSend["tipo_incinerado"] = formData.detalle;
-        break;
-      case "grua":
-        dataToSend["mercaderia_transportada"] = formData.detalle;
-        break;
-      default:
-        alert("Seleccione una categoría válida.");
-        return;
+    // Adaptar "detalle" según la categoría seleccionada
+    if (formData.categoria === "mercaderia") {
+      dataToSend.tipo_mercaderia = formData.detalle; // Campo específico para Mercadería
+    } else if (formData.categoria === "vehiculo") {
+      dataToSend.tipo_vehiculo = formData.detalle; // Campo específico para Vehículo
+    } else if (formData.categoria === "incinerado") {
+      dataToSend.tipo_incinerado = formData.detalle; // Campo específico para Incinerado
+    } else if (formData.categoria === "grua") {
+      dataToSend.mercaderia_transportada = formData.detalle; // Campo específico para Grúa
+    } else {
+      dataToSend.detalle_operacion = formData.detalle; // Campo específico para Operación General
     }
+
 
     try {
       await axios.post(

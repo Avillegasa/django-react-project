@@ -94,6 +94,34 @@ const Dashboard = () => {
               Gobierno, en tareas de lucha contra el contrabando.</strong>
             </p>
           </div>
+          {/* Textos explicativos de categorías */}
+          
+          <div className="mb-6 bg-gray-100 p-4 rounded-lg border border-gray-300">
+            <h3 className="text-lg font-semibold text-gray-800">CATEGORÍAS TOMADAS EN CUENTA:</h3>
+            <ul className="list-disc list-inside text-gray-700 mt-2">
+                <li>
+                    <span className="font-bold text-gray-800">OPERACIÓN GENERAL:</span> 
+                    Incluye todas las acciones estratégicas y tácticas realizadas por las unidades operativas del Viceministerio de Lucha Contra el Contrabando. Estas abarcan patrullajes móviles y a pie, evacuaciones de áreas críticas, enfrentamientos con contrabandistas, y otras actividades enfocadas en desmantelar redes de contrabando y proteger la integridad de las fronteras del país.
+                </li>
+                <li>
+                    <span className="font-bold text-gray-800">MERCADERÍA:</span> 
+                    Hace referencia a los bienes incautados durante las operaciones. Entre ellos se encuentran alimentos no aptos para consumo, productos enlatados, equipos electrónicos de dudosa procedencia, carburantes almacenados ilegalmente, divisas no declaradas, y sustancias controladas que ingresaron al país de manera ilegal.
+                </li>
+                <li>
+                    <span className="font-bold text-gray-800">VEHÍCULO:</span> 
+                    Agrupa los automóviles, camiones, motocicletas, embarcaciones y otros medios de transporte que fueron utilizados para el traslado de contrabando. Estos vehículos son detenidos en los puntos de control o durante operativos en ruta y, dependiendo de su estado, pueden ser retenidos o puestos a disposición de las autoridades competentes.
+                </li>
+                <li>
+                    <span className="font-bold text-gray-800">INCINERADO:</span> 
+                    Se refiere a los vehículos comisados que, por su uso en actividades ilegales o su estado, no pueden ser reutilizados ni subastados, y son incinerados como medida preventiva. Este procedimiento se lleva a cabo siguiendo estrictos protocolos legales para evitar riesgos ambientales y sanitarios.
+                </li>
+                <li>
+                    <span className="font-bold text-gray-800">GRIA:</span> 
+                    Representa los comisos realizados por los Grupos de Reacción Inmediata Aduanera (GRIA), unidades especializadas en responder de manera rápida y eficiente ante actividades sospechosas de contrabando. Estos equipos operan en zonas estratégicas y utilizan tecnología avanzada para interceptar bienes ilegales.
+                </li>
+            </ul>
+        </div>
+
         </div>
       </div>
     </div>
