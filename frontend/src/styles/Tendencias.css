@@ -1,0 +1,31 @@
+.tendencias-container {
+    display: flex;
+    height: 100vh; /* Usar toda la altura de la pantalla */
+    background-color: #f9f9f9; /* Color de fondo para mejorar la visualización */
+}
+
+.sidebar {
+    flex: 0 0 250px; /* Anchura fija para la barra lateral */
+}
+
+.tendencias-content {
+    flex: 1; /* Ocupa el resto del espacio disponible */
+    padding: 20px; /* Espaciado interno */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #ffffff; /* Fondo blanco para el contenido principal */
+    box-shadow: -1px 0 5px rgba(0, 0, 0, 0.1); /* Sombra para separar del sidebar */
+}
+
+.tendencias-content h1 {
+    margin-bottom: 20px;
+    color: #333; /* Color del texto */
+}
+
+.tendencias-content p {
+    margin-bottom: 20px;
+    font-size: 1.1rem;
+    color: #666; /* Texto secundario */
+}
