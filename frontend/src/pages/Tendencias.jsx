@@ -1,10 +1,10 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Navigate, Link } from "react-router-dom";
-import { UserContext } from "../contexts/UserContext";
-import Sidebar from "../components/Sidebar";
-import { fetchPrediction, fetchCategoryData } from "../services/predictions";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
+import { Link, Navigate } from "react-router-dom";
+import { Bar, BarChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 import UserIcon from "../assets/icons/usericon.png";
+import Sidebar from "../components/Sidebar";
+import { UserContext } from "../contexts/UserContext";
+import { fetchCategoryData, fetchPrediction } from "../services/predictions";
 
 const Tendencias = () => {
     const { user } = useContext(UserContext);

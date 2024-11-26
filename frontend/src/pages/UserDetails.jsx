@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { UserContext } from "../contexts/UserContext";
-import Sidebar from "../components/Sidebar";
+import React, { useContext, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import UserIcon from "../assets/icons/usericon.png";
+import Sidebar from "../components/Sidebar";
+import { UserContext } from "../contexts/UserContext";
 
 const UserDetails = () => {
   const { user } = useContext(UserContext);

@@ -1,7 +1,7 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { UserContext } from '../contexts/UserContext';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import React, { useContext, useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { UserContext } from '../contexts/UserContext';
 
 const UserProfile = () => {
     const { user } = useContext(UserContext);

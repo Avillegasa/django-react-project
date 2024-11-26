@@ -1,9 +1,9 @@
 import React, { useContext } from "react";
-import { Navigate, Link } from "react-router-dom";
-import { UserContext } from "../contexts/UserContext";
-import Sidebar from "../components/Sidebar";
-import InicioLogo from "../assets/images/inicioimag.png";
+import { Link, Navigate } from "react-router-dom";
 import UserIcon from "../assets/icons/usericon.png";
+import InicioLogo from "../assets/images/inicioimag.png";
+import Sidebar from "../components/Sidebar";
+import { UserContext } from "../contexts/UserContext";
 
 const Dashboard = () => {
   const { user } = useContext(UserContext);
