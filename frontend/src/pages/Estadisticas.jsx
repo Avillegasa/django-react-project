@@ -1,6 +1,6 @@
 import axios from 'axios';
 import "chart.js/auto";
-import { default as React, default as React, useContext, useEffect, useState } from 'react';
+import { default as React, useContext, useEffect, useState } from 'react';
 import { Bar, Line } from "react-chartjs-2";
 import { Link, Navigate } from "react-router-dom";
 import UserIcon from "../assets/icons/usericon.png";
@@ -19,7 +19,7 @@ const Estadisticas = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get("http://127.0.0.1:8000/api/all-comisos/", {
+                const response = await axios.get("http://127.0.0.1:8000/api/comisos/all-comisos/", {
                     headers: { Authorization: `Token ${user.token}` },
                 });
                 console.log("Datos obtenidos del backend:", response.data); // Para depuración

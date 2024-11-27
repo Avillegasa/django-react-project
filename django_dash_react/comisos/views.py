@@ -18,14 +18,6 @@ from .serializers import (
     IncineradoSerializer,
     GruaSerializer,
 )
-
-
-
-
-
-
-
-
 # Vista basada en función para obtener todos los comisos
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])

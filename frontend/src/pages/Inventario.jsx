@@ -22,7 +22,7 @@ const Inventario = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/all-comisos/", {
+        const response = await axios.get("http://127.0.0.1:8000/api/comisos/all-comisos/", {
           headers: { Authorization: `Token ${user.token}` },
         });
         setComisos(response.data); // Guardar los datos en el estado

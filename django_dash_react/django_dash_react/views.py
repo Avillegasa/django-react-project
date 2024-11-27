@@ -1,9 +1,9 @@
-from django.shortcuts import render
-import os
+from django.http import JsonResponse
 
-def index(request):
-    return render(request, 'index.html')
-
-#def index(request): 
-    #Renderiza el archivo `index.html` desde la carpeta `static` generada por Vite
-   #return render (request, 'index.html')
+def api_root(request):
+    return JsonResponse({
+        "users": "/api/users/",
+        "comisos": "/api/comisos/",
+        "login": "/api/login/",
+        "logout": "/api/logout/"
+    })
