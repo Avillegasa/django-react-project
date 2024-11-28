@@ -1,12 +1,12 @@
 import axios from "axios";
 import React, { useContext, useState } from "react";
-import { Link, Navigate } from "react-router-dom";
-import UserIcon from "../assets/icons/usericon.png";
+import { Navigate } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import { UserContext } from "../contexts/UserContext";
 
 const Incautaciones = () => {
   const { user } = useContext(UserContext);
+
   const [formData, setFormData] = useState({
     categoria: "",
     detalle: "",
@@ -16,6 +16,9 @@ const Incautaciones = () => {
     cantidad: "",
   });
 
+  const [detallesOpciones, setDetallesOpciones] = useState([]);
+
+  // Opciones por categoría
   const categorias = [
     { value: "operacion-general", label: "Operación General" },
     { value: "mercaderia", label: "Mercadería" },
@@ -47,39 +50,69 @@ const Incautaciones = () => {
     { value: "Diciembre", label: "Diciembre" },
   ];
 
+  // Opciones para cada categoría
+  const detallesPorCategoria = {
+    "operacion-general": [
+      "PATRULLAJES MOVIL",
+      "PATRULLAJES A PIE",
+      "PUESTOS DE CONTROL FIJO",
+      "PUESTO DE CONTROL MOVILES",
+      "RECONOCIMIENTO",
+      "ESCOLTAS",
+      "TRASLADO DE VEHICULOS",
+      "TRASLADO DE COMISOS O MERCADERIA",
+      "OPERACIONES LOGISTICAS",
+      "EVACUACIONES",
+      "ENFRENTAMIENTO CON CONTRABANDISTAS",
+      "REUNION CON LOS COMUNARIOS DEL LUGAR",
+      "INCINERACION DE VEHICULOS CHUTOS",
+    ],
+    mercaderia: [
+      "PERECEDERA",
+      "NO PERECEDERA",
+      "MERCADERIA VARIADA",
+      "CARBURANTES",
+      "SUSTANCIAS CONTROLADAS",
+      "DIVISAS",
+      "VEHICULOS",
+    ],
+    vehiculo: ["LIVIANOS", "MEDIANOS", "PESADOS", "MOTOCICLETAS", "EMBARCACIONES"],
+    incinerado: ["LIVIANOS", "MEDIANOS", "PESADOS", "MOTOCICLETAS", "EMBARCACIONES"],
+    grua: [
+      "PERECEDERA",
+      "NO PERECEDERA",
+      "MERCADERIA VARIADA",
+      "CARBURANTES",
+      "SUSTANCIAS CONTROLADAS",
+      "DIVISAS",
+      "VEHICULOS LIVIANOS",
+      "VEHICULOS MEDIANOS",
+      "VEHICULOS PESADOS",
+      "MOTOCICLETAS",
+      "EMBARCACIONES",
+    ],
+  };
+
+  // Manejar cambio en el formulario
   const handleInputChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+
+    if (name === "categoria") {
+      // Actualizar opciones de detalle según categoría
+      setDetallesOpciones(detallesPorCategoria[value] || []);
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Crear objeto base con campos comunes
     const dataToSend = {
-      anio: parseInt(formData.anio),
-      mes: formData.mes,
-      semana: formData.semana.replace("semana_", ""), // Convertir a número
+      ...formData,
+      semana: formData.semana.replace("semana_", ""),
       cantidad: parseInt(formData.cantidad),
-      detalle: formData.detalle,
-      categoria: formData.categoria,
+      anio: parseInt(formData.anio),
     };
-
-    // Adaptar "detalle" según la categoría seleccionada
-    if (formData.categoria === "mercaderia") {
-      dataToSend.tipo_mercaderia = formData.detalle; // Campo específico para Mercadería
-    } else if (formData.categoria === "vehiculo") {
-      dataToSend.tipo_vehiculo = formData.detalle; // Campo específico para Vehículo
-    } else if (formData.categoria === "incinerado") {
-      dataToSend.tipo_incinerado = formData.detalle; // Campo específico para Incinerado
-    } else if (formData.categoria === "grua") {
-      dataToSend.mercaderia_transportada = formData.detalle; // Campo específico para Grúa
-    } else {
-      dataToSend.detalle_operacion = formData.detalle; // Campo específico para Operación General
-    }
-
 
     try {
       await axios.post(
@@ -93,7 +126,7 @@ const Incautaciones = () => {
         }
       );
 
-      alert(`${formData.categoria.replace("-", " ")} registrado correctamente`);
+      alert("Registro realizado con éxito");
       setFormData({
         categoria: "",
         detalle: "",
@@ -103,8 +136,8 @@ const Incautaciones = () => {
         cantidad: "",
       });
     } catch (error) {
-      console.error(`Error registrando ${formData.categoria}:`, error.response?.data || error);
-      alert(`Error al registrar ${formData.categoria.replace("-", " ")}`);
+      console.error("Error al registrar:", error.response?.data || error);
+      alert("Error al registrar");
     }
   };
 
@@ -114,40 +147,18 @@ const Incautaciones = () => {
 
   return (
     <div className="flex min-h-screen">
-      {/* Sidebar */}
       <Sidebar />
-
-      {/* Contenido Principal */}
       <div className="flex-1 flex flex-col">
-        {/* Barra Superior */}
-        <div className="bg-[#ECF0F1] border-b border-black flex items-center justify-between px-6 py-3">
-          <h1 className="text-xl tracking-[0.5em] font-bold text-black">
-            SICOSE
-          </h1>
-          <Link to="/user-details">
-            <img
-              src={UserIcon}
-              alt="Usuario"
-              className="w-[32px] h-[32px] cursor-pointer hover:opacity-80"
-            />
-          </Link>
+        <div className="bg-[#ECF0F1] border-b px-6 py-3">
+          <h1 className="text-xl font-bold">SICOSE</h1>
         </div>
-
-        {/* Formulario */}
         <div className="flex flex-col items-center justify-start flex-1 p-8 bg-gray-100">
           <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-4xl">
-            <h2 className="text-2xl font-bold mb-6">
-              Registro de Incautaciones
-            </h2>
-            <form
-              className="grid grid-cols-1 md:grid-cols-2 gap-6"
-              onSubmit={handleSubmit}
-            >
-              {/* Categoría de incautación */}
+            <h2 className="text-2xl font-bold mb-6">Registro de Incautaciones</h2>
+            <form className="grid grid-cols-1 md:grid-cols-2 gap-6" onSubmit={handleSubmit}>
+              {/* Categoría */}
               <div>
-                <label className="block font-bold text-gray-700">
-                  Categoría de incautación
-                </label>
+                <label className="block font-bold text-gray-700">Categoría de incautación</label>
                 <select
                   name="categoria"
                   value={formData.categoria}
@@ -166,18 +177,21 @@ const Incautaciones = () => {
 
               {/* Detalle */}
               <div>
-                <label className="block font-bold text-gray-700">
-                  Detalle
-                </label>
-                <input
-                  type="text"
+                <label className="block font-bold text-gray-700">Detalle</label>
+                <select
                   name="detalle"
-                  placeholder="Ingrese el detalle"
                   value={formData.detalle}
                   onChange={handleInputChange}
                   className="mt-1 p-2 border rounded w-full"
                   required
-                />
+                >
+                  <option value="">Seleccione un detalle</option>
+                  {detallesOpciones.map((det) => (
+                    <option key={det} value={det}>
+                      {det}
+                    </option>
+                  ))}
+                </select>
               </div>
 
               {/* Año */}
@@ -213,11 +227,9 @@ const Incautaciones = () => {
                 </select>
               </div>
 
-              {/* Seleccionar una semana */}
+              {/* Semana */}
               <div>
-                <label className="block font-bold text-gray-700">
-                  Seleccione una semana
-                </label>
+                <label className="block font-bold text-gray-700">Seleccione una semana</label>
                 <select
                   name="semana"
                   value={formData.semana}
@@ -236,9 +248,7 @@ const Incautaciones = () => {
 
               {/* Cantidad */}
               <div>
-                <label className="block font-bold text-gray-700">
-                  Cantidad
-                </label>
+                <label className="block font-bold text-gray-700">Cantidad</label>
                 <input
                   type="number"
                   name="cantidad"
@@ -252,10 +262,7 @@ const Incautaciones = () => {
 
               {/* Botón */}
               <div className="col-span-2 flex justify-end">
-                <button
-                  type="submit"
-                  className="bg-[#2980B9] text-white px-6 py-2 rounded-lg"
-                >
+                <button type="submit" className="bg-[#2980B9] text-white px-6 py-2 rounded-lg">
                   Registrar Incautación
                 </button>
               </div>
@@ -267,6 +274,4 @@ const Incautaciones = () => {
   );
 };
 
- export default Incautaciones;
-
-
+export default Incautaciones;
