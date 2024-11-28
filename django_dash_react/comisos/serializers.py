@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import OperacionGeneral, Mercaderia, Vehiculo, Incinerado, Grua
+from .analytics_models import HistoricalData
 
 class OperacionGeneralSerializer(serializers.ModelSerializer):
     class Meta:
@@ -25,3 +26,8 @@ class GruaSerializer(serializers.ModelSerializer):
     class Meta:
         model = Grua
         fields = '__all__'
+
+class HistoricalDataSerializer(serializers.ModelSerializer):
+    class Meta: 
+        model = HistoricalData
+        fields = ['category','date','quantity','value']   

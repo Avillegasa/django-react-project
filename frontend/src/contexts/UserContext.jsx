@@ -1,10 +1,12 @@
-import React, { createContext, useState, useEffect } from "react";
 import axios from 'axios';
+import React, { createContext, useEffect, useState } from "react";
 
 export const UserContext = createContext();
 
 export const UserProvider = ({ children }) => {
     const [user, setUser] = useState(null);
+    const [selectedCategory, setSelectedCategory] = useState("Prediccion General"); // Categoria seleccionada
+    const [selectedPeriod, setSelectedPeriod] = useState("month"); // Periodo seleccionado (mensual por defecto)
 
     useEffect(() => {
         // Cargar el token desde localStorage si existe
@@ -24,7 +26,7 @@ export const UserProvider = ({ children }) => {
     }, []);
 
     return (
-        <UserContext.Provider value={{ user, setUser }}>
+        <UserContext.Provider value={{ user, setUser, selectedCategory, setSelectedPeriod, selectedPeriod, setSelectedPeriod, }}>
             {children}
         </UserContext.Provider>
     );
