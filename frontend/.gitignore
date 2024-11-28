@@ -1,3 +1,6 @@
+#la huevada de env
+env/
+
 # Logs
 logs
 *.log

@@ -98,8 +98,8 @@ DATABASES = {
      'default': {
          'ENGINE': 'django.db.backends.mysql',
          'NAME': 'django_dash_db',
-         'USER': 'avillegas',
-         'PASSWORD': 'Avillegasa@123',
+         'USER': 'root',
+         'PASSWORD': 'Avillegasa@19',
          'HOST': 'localhost',
          'PORT': '3306',
      }

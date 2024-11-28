@@ -75,3 +75,4 @@ class Grua(models.Model):
 
     def __str__(self):
         return f"{self.mercaderia_transportada} - {self.anio}/{self.mes}"
+from django.db import models
