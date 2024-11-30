@@ -99,7 +99,7 @@ DATABASES = {
          'ENGINE': 'django.db.backends.mysql',
          'NAME': 'django_dash_db',
          'USER': 'avillegas',
-         'PASSWORD': 'Avillegasa@123',
+         'PASSWORD': '021979',
          'HOST': 'localhost',
          'PORT': '3306',
      }
