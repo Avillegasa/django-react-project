@@ -1,9 +1,11 @@
 import axios from "axios";
+axios.defaults.withCredentials = true;
 import React, { useContext, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import UserIcon from "../assets/icons/usericon.png";
 import Sidebar from "../components/Sidebar";
 import { UserContext } from "../contexts/UserContext";
+import { getCsrfToken } from "../services/csrf";  // Importar la función para obtener el CSRF
 
 const Incautaciones = () => {
   const { user } = useContext(UserContext);
@@ -80,8 +82,11 @@ const Incautaciones = () => {
       dataToSend.detalle_operacion = formData.detalle; // Campo específico para Operación General
     }
 
-
+    const csrfToken = getCsrfToken();  // Obtener el token CSRF
+      
     try {
+     
+      // Realizar la solicitud POST con CSRF y token de usuario en las cabeceras
       await axios.post(
         `http://127.0.0.1:8000/api/comisos/${formData.categoria}/`,
         dataToSend,
@@ -89,6 +94,7 @@ const Incautaciones = () => {
           headers: {
             Authorization: `Token ${user.token}`,
             "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken,  // Agregar el token CSRF aquí
           },
         }
       );
@@ -102,11 +108,25 @@ const Incautaciones = () => {
         semana: "",
         cantidad: "",
       });
+  
+      console.log("Token CSRF:", csrfToken);
+      console.log("Cabeceras de la solicitud:", {
+        Authorization: `Token ${user.token}`,
+        "Content-Type": "application/json",
+        "X-CSRFToken": csrfToken,
+      });
+
+
+
     } catch (error) {
       console.error(`Error registrando ${formData.categoria}:`, error.response?.data || error);
       alert(`Error al registrar ${formData.categoria.replace("-", " ")}`);
     }
   };
+
+  
+
+  
 
   if (!user) {
     return <Navigate to="/" />;
