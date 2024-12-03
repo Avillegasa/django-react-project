@@ -4,6 +4,8 @@ import { Link, Navigate } from "react-router-dom";
 import UserIcon from "../assets/icons/usericon.png";
 import Sidebar from "../components/Sidebar";
 import { UserContext } from "../contexts/UserContext";
+import { getCsrfToken } from "../services/csrf"; // Importar la función para obtener el CSRF
+axios.defaults.withCredentials = true;
 
 const Incautaciones = () => {
   const { user } = useContext(UserContext);
@@ -88,14 +90,19 @@ const Incautaciones = () => {
         break;
     }
 
+    const csrfToken = getCsrfToken();  // Obtener el token CSRF
+      
     try {
-      const response = await axios.post(
-        `http://127.0.0.1:8000/api/comisos/all-comisos/`, // Verifica esta URL
+     
+      // Realizar la solicitud POST con CSRF y token de usuario en las cabeceras
+      await axios.post(
+        `http://127.0.0.1:8000/api/comisos/${formData.categoria}/`,
         dataToSend,
         {
           headers: {
             Authorization: `Token ${user.token}`,
             "Content-Type": "application/json",
+            "X-CSRFToken": csrfToken,  // Agregar el token CSRF aquí
           },
         }
       );
@@ -109,11 +116,23 @@ const Incautaciones = () => {
         semana: "",
         cantidad: "",
       });
+  
+      console.log("Cabeceras de la solicitud:", {
+        Authorization: `Token ${user.token}`,
+        "Content-Type": "application/json",
+      });
+
+
+
     } catch (error) {
       console.error("Error registrando:", error.response?.data || error);
       alert(`Error al registrar ${formData.categoria.replace("-", " ")}`);
     }
   };
+
+  
+
+  
 
   if (!user) {
     return <Navigate to="/" />;

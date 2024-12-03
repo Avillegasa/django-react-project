@@ -53,22 +53,32 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    #'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  
     'django.middleware.common.CommonMiddleware',
-    "corsheaders.middleware.CorsMiddleware",
-    "django.middleware.common.CommonMiddleware",
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+    
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173", #Puerto donde corre React
 ]
+CORS_ALLOW_CREDENTIALS = True
+
+# Asegúrate de que estas configuraciones estén presentes
+CSRF_COOKIE_NAME = 'csrftoken'  # Nombre de la cookie
+CSRF_COOKIE_HTTPONLY = False   # Debe ser False para permitir el acceso desde JavaScript
+CSRF_COOKIE_SECURE = False     # Debe ser False en desarrollo (en producción, ponlo en True si usas HTTPS)
+CSRF_COOKIE_SAMESITE = 'Lax'       # Ayuda a prevenir fugas de cookies
+CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'  # Nombre del encabezado para CSRF
+CSRF_TRUSTED_ORIGINS = [
+    'https://localhost:3000',
+]
+
 
 CORS_ALLOWED_CREDENTIALS = True
 CORS_ALLOW_ALL_ORIGINS = False
@@ -98,15 +108,16 @@ WSGI_APPLICATION = 'django_dash_react.wsgi.application'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-     'default': {
-         'ENGINE': 'django.db.backends.mysql',
-         'NAME': 'django_dash_db',
-         'USER': 'avillegas',
-         'PASSWORD': 'Avillegasa@123',
-         'HOST': 'localhost',
-         'PORT': '3306',
-     }
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'django_dash_db',
+        'USER': 'avillegas',
+        'PASSWORD': 'Avillegasa@123',
+        'HOST': 'localhost',
+        'PORT': '3306',
+    }
 }
+
 
 
 # Password validationgit checkout Icondoric
