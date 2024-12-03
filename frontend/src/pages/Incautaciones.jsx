@@ -57,8 +57,8 @@ const Incautaciones = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Crear objeto base con campos comunes
-    const dataToSend = {
+    // Preparar los datos según la categoría
+    let dataToSend = {
       anio: parseInt(formData.anio),
       mes: formData.mes,
       semana: formData.semana.replace("semana_", ""), // Convertir a número
@@ -67,23 +67,30 @@ const Incautaciones = () => {
       categoria: formData.categoria,
     };
 
-    // Adaptar "detalle" según la categoría seleccionada
-    if (formData.categoria === "mercaderia") {
-      dataToSend.tipo_mercaderia = formData.detalle; // Campo específico para Mercadería
-    } else if (formData.categoria === "vehiculo") {
-      dataToSend.tipo_vehiculo = formData.detalle; // Campo específico para Vehículo
-    } else if (formData.categoria === "incinerado") {
-      dataToSend.tipo_incinerado = formData.detalle; // Campo específico para Incinerado
-    } else if (formData.categoria === "grua") {
-      dataToSend.mercaderia_transportada = formData.detalle; // Campo específico para Grúa
-    } else {
-      dataToSend.detalle_operacion = formData.detalle; // Campo específico para Operación General
+    // Añadir el campo específico de la categoría
+    switch (formData.categoria) {
+      case "mercaderia":
+        dataToSend.tipo_mercaderia = formData.detalle;
+        break;
+      case "vehiculo":
+        dataToSend.tipo_vehiculo = formData.detalle;
+        break;
+      case "incinerado":
+        dataToSend.tipo_incinerado = formData.detalle;
+        break;
+      case "grua":
+        dataToSend.mercaderia_transportada = formData.detalle;
+        break;
+      case "operacion-general":
+        dataToSend.detalle_operacion = formData.detalle;
+        break;
+      default:
+        break;
     }
 
-
     try {
-      await axios.post(
-        `http://127.0.0.1:8000/api/comisos/${formData.categoria}/`,
+      const response = await axios.post(
+        `http://127.0.0.1:8000/api/comisos/all-comisos/`, // Verifica esta URL
         dataToSend,
         {
           headers: {
@@ -92,7 +99,7 @@ const Incautaciones = () => {
           },
         }
       );
-
+      console.log("Registro exitoso:", response.data);
       alert(`${formData.categoria.replace("-", " ")} registrado correctamente`);
       setFormData({
         categoria: "",
@@ -103,7 +110,7 @@ const Incautaciones = () => {
         cantidad: "",
       });
     } catch (error) {
-      console.error(`Error registrando ${formData.categoria}:`, error.response?.data || error);
+      console.error("Error registrando:", error.response?.data || error);
       alert(`Error al registrar ${formData.categoria.replace("-", " ")}`);
     }
   };
@@ -111,12 +118,11 @@ const Incautaciones = () => {
   if (!user) {
     return <Navigate to="/" />;
   }
-
   return (
     <div className="flex min-h-screen">
       {/* Sidebar */}
       <Sidebar />
-
+  
       {/* Contenido Principal */}
       <div className="flex-1 flex flex-col">
         {/* Barra Superior */}
@@ -132,13 +138,11 @@ const Incautaciones = () => {
             />
           </Link>
         </div>
-
+  
         {/* Formulario */}
         <div className="flex flex-col items-center justify-start flex-1 p-8 bg-gray-100">
           <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-4xl">
-            <h2 className="text-2xl font-bold mb-6">
-              Registro de Incautaciones
-            </h2>
+            <h2 className="text-2xl font-bold mb-6">Registro de Incautaciones</h2>
             <form
               className="grid grid-cols-1 md:grid-cols-2 gap-6"
               onSubmit={handleSubmit}
@@ -163,12 +167,10 @@ const Incautaciones = () => {
                   ))}
                 </select>
               </div>
-
+  
               {/* Detalle */}
               <div>
-                <label className="block font-bold text-gray-700">
-                  Detalle
-                </label>
+                <label className="block font-bold text-gray-700">Detalle</label>
                 <input
                   type="text"
                   name="detalle"
@@ -179,7 +181,7 @@ const Incautaciones = () => {
                   required
                 />
               </div>
-
+  
               {/* Año */}
               <div>
                 <label className="block font-bold text-gray-700">Año</label>
@@ -193,7 +195,7 @@ const Incautaciones = () => {
                   required
                 />
               </div>
-
+  
               {/* Mes */}
               <div>
                 <label className="block font-bold text-gray-700">Mes</label>
@@ -212,8 +214,8 @@ const Incautaciones = () => {
                   ))}
                 </select>
               </div>
-
-              {/* Seleccionar una semana */}
+  
+              {/* Semana */}
               <div>
                 <label className="block font-bold text-gray-700">
                   Seleccione una semana
@@ -226,19 +228,17 @@ const Incautaciones = () => {
                   required
                 >
                   <option value="">Seleccione una semana</option>
-                  {semanas.map((sem) => (
-                    <option key={sem.value} value={sem.value}>
-                      {sem.label}
+                  {semanas.map((semana) => (
+                    <option key={semana.value} value={semana.value}>
+                      {semana.label}
                     </option>
                   ))}
                 </select>
               </div>
-
+  
               {/* Cantidad */}
               <div>
-                <label className="block font-bold text-gray-700">
-                  Cantidad
-                </label>
+                <label className="block font-bold text-gray-700">Cantidad</label>
                 <input
                   type="number"
                   name="cantidad"
@@ -249,12 +249,12 @@ const Incautaciones = () => {
                   required
                 />
               </div>
-
-              {/* Botón */}
-              <div className="col-span-2 flex justify-end">
+  
+              {/* Botón de envío */}
+              <div className="col-span-2 flex justify-center mt-6">
                 <button
                   type="submit"
-                  className="bg-[#2980B9] text-white px-6 py-2 rounded-lg"
+                  className="bg-blue-500 text-white px-6 py-2 rounded-md hover:bg-blue-600"
                 >
                   Registrar Incautación
                 </button>
@@ -267,6 +267,4 @@ const Incautaciones = () => {
   );
 };
 
- export default Incautaciones;
-
-
+export default Incautaciones;  

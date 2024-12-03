@@ -35,10 +35,13 @@ const LoginUser = () => {
       );
 
       const { token, role } = response.data;
-      localStorage.setItem("userToken", token);
+      localStorage.setItem("userToken", token); // Guardamos el token
+      localStorage.setItem("role", role); // Guardamos el rol
 
       // Almacena el token y el rol en el contexto de usuario
       setUser({ token, role });
+
+      // Redirige a la página de dashboard
       navigate("/dashboard");
     } catch (error) {
       if (error.response) {
@@ -50,7 +53,6 @@ const LoginUser = () => {
       }
     }
   };
-
   return (
     <div className="min-h-screen flex relative">
       {/* Sección Izquierda */}

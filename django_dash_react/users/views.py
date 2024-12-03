@@ -1,4 +1,3 @@
-# users/views.py
 from rest_framework import generics, status
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
@@ -6,15 +5,16 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate, get_user_model
+from django.contrib.auth.models import User
 from .models import UserProfile
 from .serializers import UserProfileSerializer
-from django.core.exceptions import ObjectDoesNotExist
 
 User = get_user_model()
 
 class RegisterUserView(generics.CreateAPIView):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
+
 class LoginUserView(APIView):
     def post(self, request):
         username = request.data.get('username')
@@ -25,7 +25,8 @@ class LoginUserView(APIView):
             return Response({"error": "Se requieren todos los campos"}, status=status.HTTP_400_BAD_REQUEST)
 
         # Autenticar al usuario
-        user = authenticate(username=username, password=password)
+        user = authenticate(request, username=username, password=password)
+
         if user is None:
             # Comprobar si el usuario existe pero la contraseña es incorrecta
             if UserProfile.objects.filter(username=username).exists():
@@ -38,12 +39,11 @@ class LoginUserView(APIView):
         # Obtener o crear el token
         try:
             token, created = Token.objects.get_or_create(user=user)
+            # Accede directamente al campo 'role' del usuario
             return Response({'token': token.key, 'role': user.role}, status=status.HTTP_200_OK)
         except Exception as e:
-            print("Error al crear o recuperar el token:", e)
-            return Response({"error": "Error interno del servidor"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-   
-        
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 class UserDetailView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -51,6 +51,7 @@ class UserDetailView(APIView):
         serializer = UserProfileSerializer(request.user)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
+# Vista para obtener lista de usuarios (solo para administradores)
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def list_users(request):
@@ -60,6 +61,7 @@ def list_users(request):
         return Response(serializer.data)
     return Response({'error': 'No tiene permiso para ver esta información.'}, status=403)
 
+# Vista para crear un usuario (solo para administradores)
 class CreateUserView(generics.CreateAPIView):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
@@ -70,6 +72,7 @@ class CreateUserView(generics.CreateAPIView):
             return Response({'error': 'No tiene permiso para crear usuarios.'}, status=status.HTTP_403_FORBIDDEN)
         return super().post(request, *args, **kwargs)
 
+# Vista para actualizar o eliminar un usuario (solo para administradores)
 class UpdateDeleteUserView(generics.RetrieveUpdateDestroyAPIView):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer

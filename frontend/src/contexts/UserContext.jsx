@@ -12,11 +12,12 @@ export const UserProvider = ({ children }) => {
         // Cargar el token desde localStorage si existe
         const token = localStorage.getItem("userToken");
         if (token) {
+            // Hacer la solicitud con el token de autenticación
             axios.get("http://127.0.0.1:8000/api/users/me/", {
                 headers: { Authorization: `Token ${token}` },
             })
             .then(response => {
-                // Almacena el token y el rol devuelto por el backend en el contexto
+                // Almacenar el token y el rol devuelto por el backend en el contexto
                 setUser({ token, role: response.data.role });
             })
             .catch(error => {
@@ -26,7 +27,7 @@ export const UserProvider = ({ children }) => {
     }, []);
 
     return (
-        <UserContext.Provider value={{ user, setUser, selectedCategory, setSelectedPeriod, selectedPeriod, setSelectedPeriod, }}>
+        <UserContext.Provider value={{ user, setUser, selectedCategory, setSelectedCategory, selectedPeriod, setSelectedPeriod }}>
             {children}
         </UserContext.Provider>
     );

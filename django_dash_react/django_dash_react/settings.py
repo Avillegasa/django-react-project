@@ -67,8 +67,11 @@ MIDDLEWARE = [
 ]
 
 CORS_ALLOWED_ORIGINS = [
-    "https://localhost:3000", #Puerto donde corre React
+    "http://localhost:5173", #Puerto donde corre React
 ]
+
+CORS_ALLOWED_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = False
 
 ROOT_URLCONF = 'django_dash_react.urls'
 
@@ -155,8 +158,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 #Agregamos la conexion de corsheaders para react en este proyecto de Django
 
-#cors authorization
-CORS_ALLOWED_ORIGINS = ['http://localhost:5173']
 
 # Inicializacion del Schema
 REST_FRAMEWORK = {

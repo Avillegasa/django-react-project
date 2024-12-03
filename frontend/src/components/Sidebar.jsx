@@ -1,13 +1,15 @@
+// Sidebar.jsx
+
 import React, { useContext } from "react";
 import { Link } from "react-router-dom";
-import { UserContext } from "../contexts/UserContext";
-import MinLogo from '../assets/images/mindef.png';
+import LogoEstadistica from "../assets/icons/estadisicon.svg";
+import LogoIncautacion from "../assets/icons/incauicon.svg";
 import LogoInicio from "../assets/icons/inicioicon.svg";
 import LogoInventario from "../assets/icons/invenicon.svg";
-import LogoIncautacion from "../assets/icons/incauicon.svg";
 import LogoTendencia from "../assets/icons/tendenicon.svg";
-import LogoEstadistica from "../assets/icons/estadisicon.svg";
 import LogoUsuario from "../assets/icons/usericon.png";
+import MinLogo from '../assets/images/mindef.png';
+import { UserContext } from "../contexts/UserContext";
 
 const Sidebar = () => {
   const { user } = useContext(UserContext);
@@ -16,7 +18,7 @@ const Sidebar = () => {
     <div className="bg-[#2980B9] text-white min-h-screen w-64 flex flex-col items-center py-8">
       {/* Logo */}
       <Link to='/dashboard'>
-      <img src={MinLogo} alt="Ministerio de Defensa" className="w-full h-auto mb-0" />
+        <img src={MinLogo} alt="Ministerio de Defensa" className="w-full h-auto mb-0" />
       </Link>
       {/* Links de Navegación */}
       <nav className="w-full flex flex-col items-start px-4 space-y-6">
@@ -30,7 +32,7 @@ const Sidebar = () => {
         </Link>
 
         {/* Link Incautaciones */}
-        {(user?.role === "Administrador" || user?.role === "Operador") && (
+        {(user?.role === "admin" || user?.role === "operador") && (
           <Link
             to="/incautaciones"
             className="flex items-center space-x-2 text-lg hover:bg-[#2574A9] px-4 py-2 rounded-lg w-full"
@@ -41,7 +43,7 @@ const Sidebar = () => {
         )}
 
         {/* Links comunes (Inventario, Estadísticas, Tendencias, Usuario) */}
-        {(user?.role === "Administrador" || user?.role === "Operador" || user?.role === "Analista") && (
+        {(user?.role === "admin" || user?.role === "operador" || user?.role === "analista") && (
           <>
             <Link
               to="/inventario"
@@ -64,13 +66,15 @@ const Sidebar = () => {
               <img src={LogoTendencia} alt="Tendencias" className="w-6 h-6" />
               <span>Tendencias</span>
             </Link>
-            <Link
-              to="/user-details"
-              className="flex items-center space-x-2 text-lg hover:bg-[#2574A9] px-4 py-2 rounded-lg w-full"
-            >
-              <img src={LogoUsuario} alt="Usuario" className="w-6 h-6" />
-              <span>Usuario</span>
-            </Link>
+            {user?.role === "admin" && (
+              <Link
+                to="/user-details"
+                className="flex items-center space-x-2 text-lg hover:bg-[#2574A9] px-4 py-2 rounded-lg w-full"
+              >
+                <img src={LogoUsuario} alt="Usuario" className="w-6 h-6" />
+                <span>Usuario</span>
+              </Link>
+            )}
           </>
         )}
       </nav>

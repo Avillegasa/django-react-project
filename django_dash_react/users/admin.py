@@ -1,32 +1,25 @@
 from django.contrib import admin
-from django.contrib.auth.models import Group
-from django.utils.html import format_html
 from .models import UserProfile
+from django.contrib.auth.admin import UserAdmin
 
-@admin.register(UserProfile)
-class UserProfileAdmin(admin.ModelAdmin):
-    list_display = ('username', 'email', 'phone', 'role', 'is_active', 'is_staff')
-    list_filter = ('role', 'is_active')
-    search_fields = ('username', 'email', 'full_name')
-    ordering = ('username',)
+class UserProfileAdmin(UserAdmin):
+    model = UserProfile
+    list_display = ('email', 'full_name', 'role', 'is_active', 'is_staff')  # Eliminar 'date_joined'
+    list_filter = ('is_active', 'is_staff', 'role')  # Filtros disponibles
+    search_fields = ('email', 'full_name', 'role')
+    ordering = ('-last_login',)  # Usar 'last_login' en lugar de 'date_joined'
 
-    # Limit access based on user permissions
-    def has_view_permission(self, request, obj=None):
-        return request.user.is_superuser or request.user.role == 'Administrador'
-    
-    def has_add_permission(self, request):
-        return request.user.is_superuser or request.user.role == 'Administrador'
-    
-    def has_change_permission(self, request, obj=None):
-        return request.user.is_superuser or request.user.role == 'Administrador'
-    
-    def has_delete_permission(self, request, obj=None):
-        return request.user.is_superuser or request.user.role == 'Administrador'
+    fieldsets = (
+        (None, {'fields': ('email', 'username', 'password')}),
+        ('Información personal', {'fields': ('full_name', 'phone', 'role')}),
+        ('Permisos', {'fields': ('is_active', 'is_staff', 'is_superuser')}),
+        ('Fechas', {'fields': ('last_login',)}),
+    )
 
-# Optional: Unregister the default 'Group' model from admin if it's not needed
-admin.site.unregister(Group)
+    add_fieldsets = (
+        (None, {'fields': ('email', 'username', 'password1', 'password2')}),
+        ('Información personal', {'fields': ('full_name', 'phone', 'role')}),
+        ('Permisos', {'fields': ('is_active', 'is_staff', 'is_superuser')}),
+    )
 
-# Customization to add a link to the frontend
-admin.site.site_header = format_html(
-    'Django Admin - <a href="http://localhost:5173/" style="color: white; font-weight: bold;" target="_blank">Volver al Frontend</a>'
-)
+admin.site.register(UserProfile, UserProfileAdmin)

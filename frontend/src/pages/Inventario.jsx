@@ -6,7 +6,7 @@ import { UserContext } from "../contexts/UserContext";
 
 const Inventario = () => {
   const { user } = useContext(UserContext);
-  const [comisos, setComisos] = useState({}); // Estado para almacenar los datos obtenidos
+  const [comisos, setComisos] = useState([]); // Asegúrate de que comisos sea un arreglo
   const [filteredData, setFilteredData] = useState([]); // Datos filtrados
   const [loading, setLoading] = useState(true); // Estado de carga
   const [showFilters, setShowFilters] = useState(false); // Mostrar/ocultar filtros
@@ -19,26 +19,39 @@ const Inventario = () => {
     cantidad: "",
   }); // Estado para filtros
 
+  // Obtener los datos al montar el componente
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchComisos = async () => {
       try {
         const response = await axios.get("http://127.0.0.1:8000/api/comisos/all-comisos/", {
-          headers: { Authorization: `Token ${user.token}` },
+          headers: { Authorization: `Token ${user.token}` }
         });
-        setComisos(response.data); // Guardar los datos en el estado
-        setFilteredData(response.data); // Inicialmente, mostrar todos los datos
+        // Suponiendo que la respuesta es un objeto con categorías
+        const { operacion_general, mercaderia, vehiculo, incinerado, grua } = response.data;
+        setComisos({
+          operacion_general,
+          mercaderia,
+          vehiculo,
+          incinerado,
+          grua
+        });
+        setFilteredData({
+          operacion_general,
+          mercaderia,
+          vehiculo,
+          incinerado,
+          grua
+        });
       } catch (error) {
-        console.error("Error al obtener los datos:", error);
-      } finally {
-        setLoading(false); // Finalizar el estado de carga
+        console.error("Error al obtener los comisos", error);
       }
     };
+  
+    fetchComisos();
+  }, [user.token]);
+  
 
-    if (user) {
-      fetchData();
-    }
-  }, [user]);
-
+  // Manejar cambios en los filtros
   const handleFilterChange = (e) => {
     setFilters({
       ...filters,
@@ -46,44 +59,38 @@ const Inventario = () => {
     });
   };
 
+  // Aplicar los filtros
   const applyFilters = () => {
-    const filtered = {};
-    Object.entries(comisos).forEach(([category, items]) => {
-      const filteredItems = items.filter((item) => {
-        const matchesDetalle = filters.detalle
-          ? item.detalle_operacion
-              ?.toLowerCase()
-              .includes(filters.detalle.toLowerCase())
-          : true;
-        const matchesCategoria = filters.categoria
-          ? category.toLowerCase().includes(filters.categoria.toLowerCase())
-          : true;
-        const matchesSemana = filters.semana
-          ? item.semana === filters.semana
-          : true;
-        const matchesMes = filters.mes ? item.mes === filters.mes : true;
-        const matchesAnio = filters.anio ? item.anio == filters.anio : true;
-        const matchesCantidad = filters.cantidad
-          ? item.cantidad == filters.cantidad
-          : true;
+    const filtered = comisos.filter((item) => {
+      const matchesDetalle = filters.detalle
+        ? item.detalle_operacion?.toLowerCase().includes(filters.detalle.toLowerCase())
+        : true;
+      const matchesCategoria = filters.categoria
+        ? item.categoria?.toLowerCase().includes(filters.categoria.toLowerCase())
+        : true;
+      const matchesSemana = filters.semana
+        ? item.semana === filters.semana
+        : true;
+      const matchesMes = filters.mes ? item.mes === filters.mes : true;
+      const matchesAnio = filters.anio ? item.anio == filters.anio : true;
+      const matchesCantidad = filters.cantidad
+        ? item.cantidad == filters.cantidad
+        : true;
 
-        return (
-          matchesDetalle &&
-          matchesCategoria &&
-          matchesSemana &&
-          matchesMes &&
-          matchesAnio &&
-          matchesCantidad
-        );
-      });
-
-      if (filteredItems.length > 0) {
-        filtered[category] = filteredItems;
-      }
+      return (
+        matchesDetalle &&
+        matchesCategoria &&
+        matchesSemana &&
+        matchesMes &&
+        matchesAnio &&
+        matchesCantidad
+      );
     });
+
     setFilteredData(filtered);
   };
 
+  // Redirigir si el usuario no está autenticado
   if (!user) {
     return <Navigate to="/" />;
   }
@@ -183,7 +190,7 @@ const Inventario = () => {
             <h2 className="text-2xl font-bold mb-6">Datos de Inventario</h2>
             {loading ? (
               <p className="text-center">Cargando datos...</p>
-            ) : Object.keys(filteredData).length === 0 ? (
+            ) : filteredData.length === 0 ? (
               <p className="text-center">No hay datos disponibles.</p>
             ) : (
               <div className="overflow-x-auto">
@@ -198,19 +205,17 @@ const Inventario = () => {
                     </tr>
                   </thead>
                   <tbody>
-                    {Object.entries(filteredData).map(([category, items]) =>
-                      items.map((item, index) => (
-                        <tr key={`${category}-${index}`}>
-                          <td className="px-6 py-4 border-t capitalize">
-                            {category.replace("_", " ")}
-                          </td>
-                          <td className="px-6 py-4 border-t">{item.detalle_operacion || "N/A"}</td>
-                          <td className="px-6 py-4 border-t">{item.mes || "N/A"}</td>
-                          <td className="px-6 py-4 border-t">{item.anio || "N/A"}</td>
-                          <td className="px-6 py-4 border-t">{item.cantidad || "N/A"}</td>
-                        </tr>
-                      ))
-                    )}
+                    {filteredData.map((item, index) => (
+                      <tr key={index}>
+                        <td className="px-6 py-4 border-t capitalize">
+                          {item.categoria?.replace("_", " ") || "N/A"}
+                        </td>
+                        <td className="px-6 py-4 border-t">{item.detalle_operacion || "N/A"}</td>
+                        <td className="px-6 py-4 border-t">{item.mes || "N/A"}</td>
+                        <td className="px-6 py-4 border-t">{item.anio || "N/A"}</td>
+                        <td className="px-6 py-4 border-t">{item.cantidad || "N/A"}</td>
+                      </tr>
+                    ))}
                   </tbody>
                 </table>
               </div>

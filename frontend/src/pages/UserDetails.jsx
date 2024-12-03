@@ -119,7 +119,7 @@ const UserDetails = () => {
                 </div>
 
                 {/* Botón de gestionar usuarios (solo para administrador) */}
-                {userData.role === "Administrador" && (
+                {userData.role === "admin" && (
                   <div className="col-span-2 flex justify-center mt-4">
                     <button
                       onClick={() =>
