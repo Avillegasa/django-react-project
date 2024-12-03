@@ -23,5 +23,5 @@ urlpatterns = [
     path('trends/category/', CategoryTrendView.as_view(), name='category-trend'),
 
     # Ruta para obtener todos los comisos según la categoría elegida
-    path('all-comisos/', get_all_comisos, name='all-comisos'),  # Usamos esta ruta para filtrar por categoría
+    path('comisos/all-comisos/', get_all_comisos, name='all-comisos'),  # Usamos esta ruta para filtrar por categoría
 ]

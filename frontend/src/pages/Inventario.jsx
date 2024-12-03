@@ -23,33 +23,33 @@ const Inventario = () => {
   useEffect(() => {
     const fetchComisos = async () => {
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/comisos/all-comisos/", {
+        const response = await axios.get("http://127.0.0.1:8000/api/comisos/", {
           headers: { Authorization: `Token ${user.token}` }
         });
+        
         // Suponiendo que la respuesta es un objeto con categorías
         const { operacion_general, mercaderia, vehiculo, incinerado, grua } = response.data;
-        setComisos({
-          operacion_general,
-          mercaderia,
-          vehiculo,
-          incinerado,
-          grua
-        });
-        setFilteredData({
-          operacion_general,
-          mercaderia,
-          vehiculo,
-          incinerado,
-          grua
-        });
+
+        // Agrupar todas las categorías en un solo arreglo
+        const allComisos = [
+          ...operacion_general,
+          ...mercaderia,
+          ...vehiculo,
+          ...incinerado,
+          ...grua
+        ];
+
+        setComisos(allComisos);
+        setFilteredData(allComisos);
+        setLoading(false); // Actualizar el estado de carga cuando se obtienen los datos
       } catch (error) {
         console.error("Error al obtener los comisos", error);
+        setLoading(false); // Actualizar el estado de carga en caso de error
       }
     };
   
     fetchComisos();
   }, [user.token]);
-  
 
   // Manejar cambios en los filtros
   const handleFilterChange = (e) => {
@@ -184,7 +184,6 @@ const Inventario = () => {
               </div>
             </div>
           )}
-
           {/* Mostrar datos */}
           <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-7xl">
             <h2 className="text-2xl font-bold mb-6">Datos de Inventario</h2>
@@ -206,14 +205,12 @@ const Inventario = () => {
                   </thead>
                   <tbody>
                     {filteredData.map((item, index) => (
-                      <tr key={index}>
-                        <td className="px-6 py-4 border-t capitalize">
-                          {item.categoria?.replace("_", " ") || "N/A"}
-                        </td>
-                        <td className="px-6 py-4 border-t">{item.detalle_operacion || "N/A"}</td>
-                        <td className="px-6 py-4 border-t">{item.mes || "N/A"}</td>
-                        <td className="px-6 py-4 border-t">{item.anio || "N/A"}</td>
-                        <td className="px-6 py-4 border-t">{item.cantidad || "N/A"}</td>
+                      <tr key={index} className="border-b hover:bg-gray-50">
+                        <td className="px-6 py-4">{item.categoria}</td>
+                        <td className="px-6 py-4">{item.detalle_operacion}</td>
+                        <td className="px-6 py-4">{item.mes}</td>
+                        <td className="px-6 py-4">{item.anio}</td>
+                        <td className="px-6 py-4">{item.cantidad}</td>
                       </tr>
                     ))}
                   </tbody>

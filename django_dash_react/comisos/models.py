@@ -1,23 +1,7 @@
 from django.db import models
 
 class OperacionGeneral(models.Model):
-    DETALLE_OPERACION_CHOICES = [
-        ('PATRULLAJES MOVIL', 'PATRULLAJES MOVIL'),
-        ('PATRULLAJES A PIE', 'PATRULLAJES A PIE'),
-        ('PUESTOS DE CONTROL FIJO', 'PUESTOS DE CONTROL FIJO'),
-        ('PUESTO DE CONTROL MOVILES', 'PUESTO DE CONTROL MOVILES'),
-        ('RECONOCIMIENTO', 'RECONOCIMIENTO'),
-        ('ESCOLTAS', 'ESCOLTAS'),
-        ('TRASLADO DE VEHICULOS', 'TRASLADO DE VEHICULOS'),
-        ('TRASLADO DE COMISOS O MERCADERIA', 'TRASLADO DE COMISOS O MERCADERIA'),
-        ('OPERACIONES LOGISTICAS', 'OPERACIONES LOGISTICAS'),
-        ('EVACUACIONES', 'EVACUACIONES'),
-        ('ENFRENTAMIENTO CON CONTRABANDISTAS', 'ENFRENTAMIENTO CON CONTRABANDISTAS'),
-        ('REUNION CON LOS COMUNARIOS DEL LUGAR', 'REUNION CON LOS COMUNARIOS DEL LUGAR'),
-        ('INCINERACION DE VEHICULOS CHUTOS', 'INCINERACION DE VEHICULOS CHUTOS'),
-    ]
-    
-    detalle_operacion = models.CharField(max_length=255, choices=DETALLE_OPERACION_CHOICES)
+    detalle_operacion = models.CharField(max_length=255)
     anio = models.IntegerField()
     mes = models.CharField(max_length=20)
     semana_1 = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -28,21 +12,10 @@ class OperacionGeneral(models.Model):
     cantidad = models.IntegerField(default=0)
 
     def __str__(self):
-        return f"{self.detalle_operacion} - {self.anio}/{self.mes}"
-
+        return f"Operacion {self.id}"
 
 class Mercaderia(models.Model):
-    TIPO_MERCADERIA_CHOICES = [
-        ('PERECEDERA', 'PERECEDERA (COMESTIBLES ENLATADOS Y AGRICOLAS)'),
-        ('NO_PERECEDERA', 'NO PERECEDERA (LAVADORAS, MICROHONDAS, COMPUTADORAS, TELEVISORES)'),
-        ('MERCADERIA_VARIADA', 'MERCADERIA VARIADA (PERECEDERA Y NO PERECEDERA)'),
-        ('CARBURANTES', 'CARBURANTES'),
-        ('SUSTANCIAS_CONTROLADAS', 'SUSTANCIAS CONTROLADAS'),
-        ('DIVISAS', 'DIVISAS'),
-        ('VEHICULOS', 'VEHICULOS (COMISADOS INUTILIZADOS E INCINERADOS)'),
-    ]
-    
-    tipo_mercaderia = models.CharField(max_length=255, choices=TIPO_MERCADERIA_CHOICES)
+    tipo_mercaderia = models.CharField(max_length=255)
     anio = models.IntegerField()
     mes = models.CharField(max_length=20)
     semana_1 = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -53,19 +26,10 @@ class Mercaderia(models.Model):
     cantidad = models.IntegerField(default=0)
 
     def __str__(self):
-        return f"{self.tipo_mercaderia} - {self.anio}/{self.mes}"
-
+        return f"Mercadería {self.id}"
 
 class Vehiculo(models.Model):
-    TIPO_VEHICULO_CHOICES = [
-        ('LIVIANOS', 'LIVIANOS'),
-        ('MEDIANOS', 'MEDIANOS'),
-        ('PESADOS', 'PESADOS'),
-        ('MOTOCICLETAS', 'MOTOCICLETAS'),
-        ('EMBARCACIONES', 'EMBARCACIONES'),
-    ]
-    
-    tipo_vehiculo = models.CharField(max_length=255, choices=TIPO_VEHICULO_CHOICES)
+    tipo_vehiculo = models.CharField(max_length=255)
     anio = models.IntegerField()
     mes = models.CharField(max_length=20)
     semana_1 = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -76,15 +40,10 @@ class Vehiculo(models.Model):
     cantidad = models.IntegerField(default=0)
 
     def __str__(self):
-        return f"{self.tipo_vehiculo} - {self.anio}/{self.mes}"
-
+        return f"Vehículo {self.id}"
 
 class Incinerado(models.Model):
-    TIPO_INCINERADO_CHOICES = [
-        ('VEHICULOS_CHUTOS', 'INCINERACION DE VEHICULOS CHUTOS'),
-    ]
-    
-    tipo_incinerado = models.CharField(max_length=255, choices=TIPO_INCINERADO_CHOICES)
+    tipo_incinerado = models.CharField(max_length=255)
     anio = models.IntegerField()
     mes = models.CharField(max_length=20)
     semana_1 = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -95,18 +54,10 @@ class Incinerado(models.Model):
     cantidad = models.IntegerField(default=0)
 
     def __str__(self):
-        return f"{self.tipo_incinerado} - {self.anio}/{self.mes}"
-
+        return f"Incinerado {self.id}"
 
 class Grua(models.Model):
-    MERCADERIA_TRANSPORTADA_CHOICES = [
-        ('MERCADERIA', 'MERCADERIA VARIADA'),
-        ('CARBURANTES', 'CARBURANTES'),
-        ('SUSTANCIAS_CONTROLADAS', 'SUSTANCIAS CONTROLADAS'),
-        ('VEHICULOS', 'VEHICULOS COMISADOS E INCINERADOS'),
-    ]
-    
-    mercaderia_transportada = models.CharField(max_length=255, choices=MERCADERIA_TRANSPORTADA_CHOICES)
+    mercaderia_transportada = models.CharField(max_length=255)
     anio = models.IntegerField()
     mes = models.CharField(max_length=20)
     semana_1 = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -117,4 +68,4 @@ class Grua(models.Model):
     cantidad = models.IntegerField(default=0)
 
     def __str__(self):
-        return f"{self.mercaderia_transportada} - {self.anio}/{self.mes}"
+        return f"Grua {self.id}"

@@ -8,6 +8,7 @@ from sklearn.tree import DecisionTreeRegressor  # Árbol de decisión
 from sklearn.linear_model import LinearRegression
 from sklearn.preprocessing import StandardScaler
 from rest_framework.decorators import api_view, permission_classes
+from .serializers import OperacionGeneralSerializer, MercaderiaSerializer, VehiculoSerializer, IncineradoSerializer, GruaSerializer
 from django.db.models import Sum, F
 import pandas as pd
 from datetime import datetime, timedelta
@@ -24,73 +25,28 @@ from .analytics_models import HistoricalData, ComisosData
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_all_comisos(request):
-    category = request.query_params.get('category', None)  # Obtener la categoría desde la URL
+    # Obtener las categorías de la base de datos
+    operacion_general = OperacionGeneral.objects.all()
+    mercaderia = Mercaderia.objects.all()
+    vehiculo = Vehiculo.objects.all()
+    incinerado = Incinerado.objects.all()
+    grua = Grua.objects.all()
 
-    if category:
-        # Filtrar los comisos por categoría
-        if category == 'operacion_general':
-            operacion_general = OperacionGeneral.objects.all()
-            detalle = [item.detalle for item in operacion_general]
-            operacion_general = OperacionGeneralSerializer(operacion_general, many=True).data
-            return Response({"operacion_general": operacion_general, "detalle": detalle})
+    # Serializar los datos
+    operacion_general = OperacionGeneralSerializer(operacion_general, many=True).data
+    mercaderia = MercaderiaSerializer(mercaderia, many=True).data
+    vehiculo = VehiculoSerializer(vehiculo, many=True).data
+    incinerado = IncineradoSerializer(incinerado, many=True).data
+    grua = GruaSerializer(grua, many=True).data
 
-        elif category == 'mercaderia':
-            mercaderia = Mercaderia.objects.all()
-            detalle = [item.detalle for item in mercaderia]
-            mercaderia = MercaderiaSerializer(mercaderia, many=True).data
-            return Response({"mercaderia": mercaderia, "detalle": detalle})
-
-        elif category == 'vehiculo':
-            vehiculo = Vehiculo.objects.all()
-            detalle = [item.detalle for item in vehiculo]
-            vehiculo = VehiculoSerializer(vehiculo, many=True).data
-            return Response({"vehiculo": vehiculo, "detalle": detalle})
-
-        elif category == 'incinerado':
-            incinerado = Incinerado.objects.all()
-            detalle = [item.detalle for item in incinerado]
-            incinerado = IncineradoSerializer(incinerado, many=True).data
-            return Response({"incinerado": incinerado, "detalle": detalle})
-
-        elif category == 'grua':
-            grua = Grua.objects.all()
-            detalle = [item.detalle for item in grua]
-            grua = GruaSerializer(grua, many=True).data
-            return Response({"grua": grua, "detalle": detalle})
-
-        else:
-            return Response({"error": "Categoría no válida."}, status=400)
-
-    else:
-        # Si no se pasa la categoría, devolver todos los comisos
-        operacion_general = OperacionGeneral.objects.all()
-        detalle_og = [item.detalle for item in operacion_general]
-        operacion_general = OperacionGeneralSerializer(operacion_general, many=True).data
-
-        mercaderia = Mercaderia.objects.all()
-        detalle_mer = [item.detalle for item in mercaderia]
-        mercaderia = MercaderiaSerializer(mercaderia, many=True).data
-
-        vehiculo = Vehiculo.objects.all()
-        detalle_veh = [item.detalle for item in vehiculo]
-        vehiculo = VehiculoSerializer(vehiculo, many=True).data
-
-        incinerado = Incinerado.objects.all()
-        detalle_inc = [item.detalle for item in incinerado]
-        incinerado = IncineradoSerializer(incinerado, many=True).data
-
-        grua = Grua.objects.all()
-        detalle_gru = [item.detalle for item in grua]
-        grua = GruaSerializer(grua, many=True).data
-
-        return Response({
-            "operacion_general": operacion_general, "detalle_og": detalle_og,
-            "mercaderia": mercaderia, "detalle_mer": detalle_mer,
-            "vehiculo": vehiculo, "detalle_veh": detalle_veh,
-            "incinerado": incinerado, "detalle_inc": detalle_inc,
-            "grua": grua, "detalle_gru": detalle_gru,
-        })
-
+    # Devolver todos los comisos agrupados
+    return Response({
+        "operacion_general": operacion_general,
+        "mercaderia": mercaderia,
+        "vehiculo": vehiculo,
+        "incinerado": incinerado,
+        "grua": grua
+    })
 
 # Vista basada en clases para OperacionGeneral
 class OperacionGeneralListCreateView(generics.ListCreateAPIView):

@@ -76,7 +76,7 @@ CSRF_COOKIE_SECURE = False     # Debe ser False en desarrollo (en producción, p
 CSRF_COOKIE_SAMESITE = 'Lax'       # Ayuda a prevenir fugas de cookies
 CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'  # Nombre del encabezado para CSRF
 CSRF_TRUSTED_ORIGINS = [
-    'https://localhost:3000',
+    'https://localhost:5173',
 ]
 
 
