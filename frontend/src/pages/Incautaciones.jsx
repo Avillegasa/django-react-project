@@ -109,11 +109,9 @@ const Incautaciones = () => {
         cantidad: "",
       });
   
-      console.log("Token CSRF:", csrfToken);
       console.log("Cabeceras de la solicitud:", {
         Authorization: `Token ${user.token}`,
         "Content-Type": "application/json",
-        "X-CSRFToken": csrfToken,
       });
 
 
