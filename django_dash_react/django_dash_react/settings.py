@@ -28,33 +28,58 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+AUTH_USER_MODEL = 'users.UserProfile'
+
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 
 # Application definition
 
 INSTALLED_APPS = [
-    'corsheaders',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'users',
+    'comisos',
+    'rest_framework',
+    'rest_framework.authtoken',
+    'corsheaders',
+
 ]
 
 MIDDLEWARE = [
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+    
 
 CORS_ALLOWED_ORIGINS = [
+    #aqui podriamos agregar un dominio, si tuvieramos uno.
     "https://localhost:3000", #Puerto donde corre React
 ]
+CORS_ALLOW_CREDENTIALS = True
+
+# Asegúrate de que estas configuraciones estén presentes
+CSRF_COOKIE_NAME = 'csrftoken'  # Nombre de la cookie
+CSRF_COOKIE_HTTPONLY = False   # Debe ser False para permitir el acceso desde JavaScript
+CSRF_COOKIE_SECURE = False     # Debe ser False en desarrollo (en producción, ponlo en True si usas HTTPS)
+CSRF_COOKIE_SAMESITE = 'Lax'       # Ayuda a prevenir fugas de cookies
+CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'  # Nombre del encabezado para CSRF
+CSRF_TRUSTED_ORIGINS = [
+    'https://localhost:3000',
+]
+
 
 ROOT_URLCONF = 'django_dash_react.urls'
 
@@ -92,7 +117,8 @@ DATABASES = {
 }
 
 
-# Password validation
+
+# Password validationgit checkout Icondoric
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -127,12 +153,26 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR,'static'),
-] 
+STATICFILES_DIRS = [BASE_DIR / 'static']
+
+
+
 # Esto le indica a Django que busque los archivos estaticos en el directorio donde se construyen los archivos de Vite
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+#Agregamos la conexion de corsheaders para react en este proyecto de Django
+
+#cors authorization
+CORS_ALLOWED_ORIGINS = ['http://localhost:5173']
+
+# Inicializacion del Schema
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}
