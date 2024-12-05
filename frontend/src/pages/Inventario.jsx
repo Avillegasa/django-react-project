@@ -22,32 +22,32 @@ const Inventario = () => {
   // Obtener los datos al montar el componente
   useEffect(() => {
     const fetchComisos = async () => {
+      
       try {
         const response = await axios.get("http://127.0.0.1:8000/api/comisos/", {
-          headers: { Authorization: `Token ${user.token}` }
+          headers: { Authorization: `Token ${user.token}` },
         });
+
         
-        // Suponiendo que la respuesta es un objeto con categorías
+
         const { operacion_general, mercaderia, vehiculo, incinerado, grua } = response.data;
-
-        // Agrupar todas las categorías en un solo arreglo
+        
         const allComisos = [
-          ...operacion_general,
-          ...mercaderia,
-          ...vehiculo,
-          ...incinerado,
-          ...grua
+          ...operacion_general.map((item) => ({ ...item, categoria: "Operación General" })),
+          ...mercaderia.map((item) => ({ ...item, categoria: "Mercadería" })),
+          ...vehiculo.map((item) => ({ ...item, categoria: "Vehículo" })),
+          ...incinerado.map((item) => ({ ...item, categoria: "Incinerado" })),
+          ...grua.map((item) => ({ ...item, categoria: "Grúa" })),
         ];
-
         setComisos(allComisos);
         setFilteredData(allComisos);
-        setLoading(false); // Actualizar el estado de carga cuando se obtienen los datos
+        setLoading(false);
       } catch (error) {
-        console.error("Error al obtener los comisos", error);
-        setLoading(false); // Actualizar el estado de carga en caso de error
+        
+        setLoading(false);
       }
     };
-  
+
     fetchComisos();
   }, [user.token]);
 
@@ -205,15 +205,16 @@ const Inventario = () => {
                   </thead>
                   <tbody>
                     {filteredData.map((item, index) => (
-                      <tr key={index} className="border-b hover:bg-gray-50">
-                        <td className="px-6 py-4">{item.categoria}</td>
-                        <td className="px-6 py-4">{item.detalle_operacion}</td>
-                        <td className="px-6 py-4">{item.mes}</td>
-                        <td className="px-6 py-4">{item.anio}</td>
-                        <td className="px-6 py-4">{item.cantidad}</td>
-                      </tr>
+                    <tr key={index} className="border-b hover:bg-gray-50">
+                      <td className="px-6 py-4">{item.categoria}</td>
+                      <td className="px-6 py-4">{item.detalle}</td>
+                      <td className="px-6 py-4">{item.mes}</td>
+                      <td className="px-6 py-4">{item.anio}</td>
+                      <td className="px-6 py-4">{item.cantidad}</td>
+                    </tr>
                     ))}
                   </tbody>
+
                 </table>
               </div>
             )}

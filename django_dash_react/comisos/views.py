@@ -21,32 +21,43 @@ from .serializers import (
     GruaSerializer,
 )
 from .analytics_models import HistoricalData, ComisosData
-# Vista para obtener todos los comisos, filtrados por categoría
+
 @api_view(['GET'])
-@permission_classes([IsAuthenticated])
 def get_all_comisos(request):
-    # Obtener las categorías de la base de datos
-    operacion_general = OperacionGeneral.objects.all()
-    mercaderia = Mercaderia.objects.all()
-    vehiculo = Vehiculo.objects.all()
-    incinerado = Incinerado.objects.all()
-    grua = Grua.objects.all()
+    try:
+        operacion_general = OperacionGeneral.objects.all()
+        mercaderia = Mercaderia.objects.all()
+        vehiculo = Vehiculo.objects.all()
+        incinerado = Incinerado.objects.all()
+        grua = Grua.objects.all()
 
-    # Serializar los datos
-    operacion_general = OperacionGeneralSerializer(operacion_general, many=True).data
-    mercaderia = MercaderiaSerializer(mercaderia, many=True).data
-    vehiculo = VehiculoSerializer(vehiculo, many=True).data
-    incinerado = IncineradoSerializer(incinerado, many=True).data
-    grua = GruaSerializer(grua, many=True).data
+        data = {
+            "operacion_general": OperacionGeneralSerializer(operacion_general, many=True).data,
+            "mercaderia": MercaderiaSerializer(mercaderia, many=True).data,
+            "vehiculo": VehiculoSerializer(vehiculo, many=True).data,
+            "incinerado": IncineradoSerializer(incinerado, many=True).data,
+            "grua": GruaSerializer(grua, many=True).data,
+        }
 
-    # Devolver todos los comisos agrupados
-    return Response({
-        "operacion_general": operacion_general,
-        "mercaderia": mercaderia,
-        "vehiculo": vehiculo,
-        "incinerado": incinerado,
-        "grua": grua
-    })
+        # Transformar los datos para unificar el campo 'detalle'
+        for key, items in data.items():
+            for item in items:
+                if key == "operacion_general":
+                    item["detalle"] = item.pop("detalle_operacion")
+                elif key == "mercaderia":
+                    item["detalle"] = item.pop("detalle_mercaderia")
+                elif key == "vehiculo":
+                    item["detalle"] = item.pop("tipo_vehiculo")
+                elif key == "incinerado":
+                    item["detalle"] = item.pop("tipo_incinerado")
+                elif key == "grua":
+                    item["detalle"] = item.pop("mercaderia_transportada")
+
+        return Response(data, status=200)
+
+    except Exception as e:
+        return Response({"error": str(e)}, status=500)
+
 
 # Vista basada en clases para OperacionGeneral
 class OperacionGeneralListCreateView(generics.ListCreateAPIView):
@@ -94,57 +105,73 @@ class RegistrarComiso(APIView):
         anio = data.get('anio')
         mes = data.get('mes')
         cantidad = data.get('cantidad', 0)
+        semana = data.get('semana')  # Semana seleccionada
+
+        # Verificar la semana seleccionada
+        semana_campo = None
+        if semana == "1":
+            semana_campo = "semana_1"
+        elif semana == "2":
+            semana_campo = "semana_2"
+        elif semana == "3":
+            semana_campo = "semana_3"
+        elif semana == "4":
+            semana_campo = "semana_4"
+        elif semana == "5":
+            semana_campo = "semana_5"
+
+        if not semana_campo:
+            return Response({"error": "Semana no válida."}, status=status.HTTP_400_BAD_REQUEST)
 
         # Dependiendo de la categoría, se crea un objeto del modelo correspondiente
-        comiso = None
-        if categoria == 'operacion_general':
-            operacion_general = OperacionGeneral.objects.create(
-                detalle_operacion=data.get('detalle_operacion'),
-                anio=anio,
-                mes=mes,
-                cantidad=cantidad
-            )
-            comiso = operacion_general
-        elif categoria == 'mercaderia':
-            mercaderia = Mercaderia.objects.create(
-                tipo_mercaderia=data.get('tipo_mercaderia'),
-                anio=anio,
-                mes=mes,
-                cantidad=cantidad
-            )
-            comiso = mercaderia
-        elif categoria == 'vehiculo':
-            vehiculo = Vehiculo.objects.create(
-                tipo_vehiculo=data.get('tipo_vehiculo'),
-                anio=anio,
-                mes=mes,
-                cantidad=cantidad
-            )
-            comiso = vehiculo
-        elif categoria == 'incinerado':
-            incinerado = Incinerado.objects.create(
-                tipo_incinerado=data.get('tipo_incinerado'),
-                anio=anio,
-                mes=mes,
-                cantidad=cantidad
-            )
-            comiso = incinerado
-        elif categoria == 'grua':
-            grua = Grua.objects.create(
-                mercaderia_transportada=data.get('mercaderia_transportada'),
-                anio=anio,
-                mes=mes,
-                cantidad=cantidad
-            )
-            comiso = grua
-        else:
-            return Response({"error": "Categoría no válida."}, status=status.HTTP_400_BAD_REQUEST)
+        try:
+            if categoria == 'operacion-general':
+                registro = OperacionGeneral.objects.create(
+                    detalle_operacion=detalle,
+                    anio=anio,
+                    mes=mes,
+                    cantidad=cantidad,
+                    **{semana_campo: cantidad}  # Asignar el valor de cantidad a la semana seleccionada
+                )
+            elif categoria == 'mercaderia':
+                registro = Mercaderia.objects.create(
+                    tipo_mercaderia=detalle,
+                    anio=anio,
+                    mes=mes,
+                    cantidad=cantidad,
+                    **{semana_campo: cantidad}
+                )
+            elif categoria == 'vehiculo':
+                registro = Vehiculo.objects.create(
+                    tipo_vehiculo=detalle,
+                    anio=anio,
+                    mes=mes,
+                    cantidad=cantidad,
+                    **{semana_campo: cantidad}
+                )
+            elif categoria == 'incinerado':
+                registro = Incinerado.objects.create(
+                    tipo_incinerado=detalle,
+                    anio=anio,
+                    mes=mes,
+                    cantidad=cantidad,
+                    **{semana_campo: cantidad}
+                )
+            elif categoria == 'grua':
+                registro = Grua.objects.create(
+                    mercaderia_transportada=detalle,
+                    anio=anio,
+                    mes=mes,
+                    cantidad=cantidad,
+                    **{semana_campo: cantidad}
+                )
+            else:
+                return Response({"error": "Categoría no válida."}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Se guarda el comiso y se retorna una respuesta exitosa
-        if comiso:
-            return Response({"message": "Comiso registrado con éxito", "comiso_id": comiso.id}, status=status.HTTP_201_CREATED)
+            return Response({"message": "Registro exitoso", "id": registro.id}, status=status.HTTP_201_CREATED)
 
-        return Response({"message": "Error al registrar el comiso"}, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 # Vista para las predicciones de comisos
@@ -277,55 +304,3 @@ class CategoryTrendView(APIView):
             "historical_data": historical_data,
             "predicted_data": [prediction]  # Solo se incluye una predicción para el período seleccionado
         })
-
-# class CategoryTrendView(APIView):
-#     permission_classes = [AllowAny]
-
-#     def get(self, request):
-#         category = request.query_params.get('category', None)
-#         period = request.query_params.get('period', 'month')  # Período predeterminado: mes
-
-#         if not category:
-#             return Response({"error": "Se requiere un parámetro de categoría."}, status=400)
-
-#         valid_periods = ['month', 'semester', 'year']
-#         if period not in valid_periods:
-#             return Response({"error": f"Período no válido. Use {', '.join(valid_periods)}."}, status=400)
-
-#         # Filtrar datos históricos por categoría
-#         data = ComisosData.objects.filter(category=category).values('date', 'quantity', 'value').order_by('date')
-#         if not data.exists():
-#             return Response({"error": f"No hay datos disponibles para la categoría {category}."}, status=404)
-
-#         df = pd.DataFrame(data)
-#         df['date'] = pd.to_datetime(df['date'])
-#         df['timestamp'] = df['date'].astype(int) // 10**9  # Convertir la fecha en timestamp
-
-#         if df['quantity'].isnull().all():
-#             df['quantity'] = df['value']  # Si no hay valores en 'quantity', usar 'value' como base
-
-#         X = df[['timestamp', 'value']]
-#         y = df['quantity']
-#         scaler = StandardScaler()
-#         X_scaled = scaler.fit_transform(X)
-#         model = RandomForestRegressor(n_estimators=100, random_state=42)
-#         model.fit(X_scaled, y)
-
-#         steps = {
-#             'month': 30,  # 1 mes
-#             'semester': 180,  # 6 meses
-#             'year': 365  # 1 año
-#         }
-
-#         future_date = datetime.now() + timedelta(days=steps[period])
-#         future_timestamp = int(future_date.timestamp())
-#         average_value = df['value'].mean()
-#         future_scaled = scaler.transform([[future_timestamp, average_value]])
-#         predicted_quantity = model.predict(future_scaled)[0]
-
-#         prediction = {
-#             "date": future_date.strftime('%Y-%m-%d'),
-#             "quantity": max(0, predicted_quantity)
-#         }
-
-#         return Response(prediction)

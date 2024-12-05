@@ -4,7 +4,7 @@ import { Link, Navigate } from "react-router-dom";
 import UserIcon from "../assets/icons/usericon.png";
 import Sidebar from "../components/Sidebar";
 import { UserContext } from "../contexts/UserContext";
-import { getCsrfToken } from "../services/csrf"; // Importar la función para obtener el CSRF
+// import { getCsrfToken } from "../services/csrf"; // Importar la función para obtener el CSRF
 axios.defaults.withCredentials = true;
 
 const Incautaciones = () => {
@@ -59,80 +59,43 @@ const Incautaciones = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Preparar los datos según la categoría
-    let dataToSend = {
-      anio: parseInt(formData.anio),
-      mes: formData.mes,
-      semana: formData.semana.replace("semana_", ""), // Convertir a número
-      cantidad: parseInt(formData.cantidad),
-      detalle: formData.detalle,
-      categoria: formData.categoria,
+    const dataToSend = {
+        anio: parseInt(formData.anio),
+        mes: formData.mes,
+        cantidad: parseInt(formData.cantidad),
+        detalle: formData.detalle,
+        categoria: formData.categoria, // Asegúrate de que coincide con el backend
+        semana: formData.semana.replace("semana_", ""), // Enviar el número de la semana
     };
 
-    // Añadir el campo específico de la categoría
-    switch (formData.categoria) {
-      case "mercaderia":
-        dataToSend.tipo_mercaderia = formData.detalle;
-        break;
-      case "vehiculo":
-        dataToSend.tipo_vehiculo = formData.detalle;
-        break;
-      case "incinerado":
-        dataToSend.tipo_incinerado = formData.detalle;
-        break;
-      case "grua":
-        dataToSend.mercaderia_transportada = formData.detalle;
-        break;
-      case "operacion-general":
-        dataToSend.detalle_operacion = formData.detalle;
-        break;
-      default:
-        break;
-    }
+    console.log("Datos enviados:", dataToSend);
 
-    const csrfToken = getCsrfToken();  // Obtener el token CSRF
-      
     try {
-     
-      // Realizar la solicitud POST con CSRF y token de usuario en las cabeceras
-      await axios.post(
-        `http://127.0.0.1:8000/api/comisos/${formData.categoria}/`,
-        dataToSend,
-        {
-          headers: {
-            Authorization: `Token ${user.token}`,
-            "Content-Type": "application/json",
-            "X-CSRFToken": csrfToken,  // Agregar el token CSRF aquí
-          },
-        }
-      );
-      console.log("Registro exitoso:", response.data);
-      alert(`${formData.categoria.replace("-", " ")} registrado correctamente`);
-      setFormData({
-        categoria: "",
-        detalle: "",
-        anio: "",
-        mes: "",
-        semana: "",
-        cantidad: "",
-      });
-  
-      console.log("Cabeceras de la solicitud:", {
-        Authorization: `Token ${user.token}`,
-        "Content-Type": "application/json",
-      });
+        const response = await axios.post(
+            `http://127.0.0.1:8000/api/comisos/registrar/`,
+            dataToSend,
+            {
+                headers: {
+                    Authorization: `Token ${user.token}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
 
-
-
+        alert(`${formData.categoria.replace("-", " ")} registrado correctamente`);
+        setFormData({
+            categoria: "",
+            detalle: "",
+            anio: "",
+            mes: "",
+            semana: "",
+            cantidad: "",
+        });
     } catch (error) {
-      console.error("Error registrando:", error.response?.data || error);
-      alert(`Error al registrar ${formData.categoria.replace("-", " ")}`);
+        console.error("Error registrando:", error.response?.data || error);
+        alert(`Error al registrar ${formData.categoria.replace("-", " ")}`);
     }
-  };
-
-  
-
-  
+};
 
   if (!user) {
     return <Navigate to="/" />;

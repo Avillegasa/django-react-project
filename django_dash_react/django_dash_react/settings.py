@@ -24,7 +24,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-_&-xu%sp&zj+sr)cpnuy7-6t#rzbr4cql5az4r@w4wi4qzji2('
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = []
 
@@ -68,20 +68,28 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173", #Puerto donde corre React
 ]
 CORS_ALLOW_CREDENTIALS = True
-
-# Asegúrate de que estas configuraciones estén presentes
-CSRF_COOKIE_NAME = 'csrftoken'  # Nombre de la cookie
-CSRF_COOKIE_HTTPONLY = False   # Debe ser False para permitir el acceso desde JavaScript
-CSRF_COOKIE_SECURE = False     # Debe ser False en desarrollo (en producción, ponlo en True si usas HTTPS)
-CSRF_COOKIE_SAMESITE = 'Lax'       # Ayuda a prevenir fugas de cookies
-CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'  # Nombre del encabezado para CSRF
-CSRF_TRUSTED_ORIGINS = [
-    'https://localhost:5173',
+CORS_ALLOW_METHODS = [
+    "GET",
+    "POST",
+    "PUT",
+    "DELETE",
+    "OPTIONS"
 ]
 
+# CREDENTIALS REFERINGO TO CSRF SECURITY LAYER
+# Asegúrate de que estas configuraciones estén presentes
+#CSRF_COOKIE_NAME = 'csrftoken'  # Nombre de la cookie
+#CSRF_COOKIE_HTTPONLY = False   # Debe ser False para permitir el acceso desde JavaScript
+#CSRF_COOKIE_SECURE = False     # Debe ser False en desarrollo (en producción, ponlo en True si usas HTTPS)
+#CSRF_COOKIE_SAMESITE = 'Lax'       # Ayuda a prevenir fugas de cookies
+#CSRF_HEADER_NAME = 'HTTP_X_CSRFTOKEN'  # Nombre del encabezado para CSRF
+#CSRF_TRUSTED_ORIGINS = [
+#    'https://localhost:5173',
+#]
 
-CORS_ALLOWED_CREDENTIALS = True
-CORS_ALLOW_ALL_ORIGINS = False
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_ALL_ORIGINS = True
 
 ROOT_URLCONF = 'django_dash_react.urls'
 
@@ -176,3 +184,5 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
     ],
 }
+
+ALLOWED_HOSTS = ['*']

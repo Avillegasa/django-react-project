@@ -26,7 +26,7 @@ class UserProfile(AbstractBaseUser, PermissionsMixin):
     role = models.CharField(
         max_length=100,
         choices=[('admin', 'Administrador'), ('operador', 'Operador'), ('analista', 'Analista')],
-        default='analista'
+        default='admin'
     )
     date_joined = models.DateTimeField(default=timezone.now)  # Asegúrate de tener esto
 

@@ -5,9 +5,10 @@ from .views import (
     VehiculoListCreateView,
     IncineradoListCreateView,
     GruaListCreateView,
+    RegistrarComiso,
     PredictView,
     CategoryTrendView,
-    get_all_comisos,  # Nueva vista para obtener todos los comisos por categoría
+    get_all_comisos,
 )
 
 urlpatterns = [
@@ -18,10 +19,14 @@ urlpatterns = [
     path('incinerado/', IncineradoListCreateView.as_view(), name='incinerado'),
     path('grua/', GruaListCreateView.as_view(), name='grua'),
 
+    # Ruta para registrar comisos
+    path('registrar/', RegistrarComiso.as_view(), name='registrar-comiso'),
+
     # Rutas para predicciones y tendencias
     path('trends/predict/', PredictView.as_view(), name='predict-data'),
     path('trends/category/', CategoryTrendView.as_view(), name='category-trend'),
 
     # Ruta para obtener todos los comisos según la categoría elegida
-    path('comisos/all-comisos/', get_all_comisos, name='all-comisos'),  # Usamos esta ruta para filtrar por categoría
+    # path('all/', get_all_comisos, name='all-comisos'),
+    path('', get_all_comisos, name='get_all_comisos')
 ]

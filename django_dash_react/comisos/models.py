@@ -15,7 +15,7 @@ class OperacionGeneral(models.Model):
         return f"Operacion {self.id}"
 
 class Mercaderia(models.Model):
-    tipo_mercaderia = models.CharField(max_length=255)
+    detalle_mercaderia = models.CharField(max_length=255)
     anio = models.IntegerField()
     mes = models.CharField(max_length=20)
     semana_1 = models.DecimalField(max_digits=10, decimal_places=2, default=0)
