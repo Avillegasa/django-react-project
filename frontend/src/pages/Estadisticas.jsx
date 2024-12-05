@@ -1,12 +1,13 @@
 import axios from 'axios';
 import "chart.js/auto";
+import { jsPDF } from "jspdf";
+import "jspdf-autotable"; // Importar para tablas automáticas en jsPDF
 import { default as React, useContext, useEffect, useState } from 'react';
 import { Bar, Line } from "react-chartjs-2";
 import { Link, Navigate } from "react-router-dom";
 import UserIcon from "../assets/icons/usericon.png";
 import Sidebar from '../components/Sidebar';
 import { UserContext } from '../contexts/UserContext';
-
 
 const Estadisticas = () => {
     const { user } = useContext(UserContext);
@@ -19,7 +20,7 @@ const Estadisticas = () => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await axios.get("http://127.0.0.1:8000/api/comisos/all-comisos/", {
+                const response = await axios.get("http://127.0.0.1:8000/api/comisos/", {
                     headers: { Authorization: `Token ${user.token}` },
                 });
                 console.log("Datos obtenidos del backend:", response.data); // Para depuración
@@ -69,7 +70,7 @@ const Estadisticas = () => {
         "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0", "#9966FF"
     ];
 
-    // Datos para la primera gráfica (línea por meses)
+   //  Datos para la primera gráfica (línea por meses)
     const lineData = {
         labels: meses,
         datasets: categorias.map((categoria, index) => ({
@@ -89,6 +90,7 @@ const Estadisticas = () => {
             fill: false,
         })),
     };
+    
 
     // Datos para la segunda gráfica (barras agrupadas por semanas para el mes seleccionado)
     const barData = {
@@ -127,6 +129,120 @@ const Estadisticas = () => {
                 beginAtZero: true,
             },
         },
+    };
+
+    // Función para generar reporte CSV
+    const generateCSV = () => {
+        const header = ["Categoria", "Mes", "Semana", "Cantidad"];
+        const rows = [];
+
+        // Primera gráfica: Datos por mes
+        categorias.forEach((categoria) => {
+            meses.forEach((mes) => {
+                const cantidad = comisos[categoria]?.reduce((acc, item) => {
+                    if (item.mes?.toLowerCase() === mes.toLowerCase()) {
+                        return acc + (item.cantidad || 0);
+                    }
+                    return acc;
+                }, 0);
+                rows.push([categoria.replace("_", " "), mes, "Total", cantidad || 0]);
+            });
+        });
+
+        // Segunda gráfica: Datos por semana
+        [1, 2, 3, 4, 5].forEach((semana) => {
+            categorias.forEach((categoria) => {
+                const cantidad = comisos[categoria]?.reduce((acc, item) => {
+                    if (item.mes?.toLowerCase() === mes.toLowerCase()) {
+                        const key = `semana_${semana}`;
+                        if (item[key] !== undefined) {
+                            return acc + parseFloat(item[key] || 0);
+                        }
+                    }
+                    return acc;
+                }, 0);
+                rows.push([categoria.replace("_", " "), mes, `Semana ${semana}`, cantidad || 0]);
+            });
+        });
+
+        // Convertir a CSV
+        let csvContent = "data:text/csv;charset=utf-8," + header.join(",") + "\n";
+        rows.forEach((row) => {
+            csvContent += row.join(",") + "\n";
+        });
+
+        // Crear enlace de descarga
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `reporte_comisos_${anio}_${mes}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    };
+
+    // Función para generar el reporte PDF
+    const generatePDF = () => {
+        const doc = new jsPDF();
+
+        const title = `Reporte de Comisos - Año ${anio} - Mes ${mes}`;
+        // Título
+        doc.setFontSize(16);
+        doc.text(title, 50, 20);
+
+        const description3 = `Viceministerio de Lucha Contra el Contrabando - VLCC`;
+        doc.text(description3, 35, 30);
+        // Descripción del reporte
+        doc.setFontSize(12);
+        
+        const description = `Este reporte muestra las estadísticas de los comisos ocurridos durante el año ${anio}.`;
+        const description2 = `Desglosado por mes y semana.`;
+        doc.text(description, 20, 40);
+        doc.text(description2, 20, 45);
+
+        // Generar la tabla de datos
+        const tableColumns = ["Categoría", "Mes", "Semana", "Cantidad"];
+        const tableRows = [];
+
+        // Añadir datos a la tabla
+        categorias.forEach((categoria) => {
+            meses.forEach((mes) => {
+                const cantidad = comisos[categoria]?.reduce((acc, item) => {
+                    if (item.mes?.toLowerCase() === mes.toLowerCase()) {
+                        return acc + (item.cantidad || 0);
+                    }
+                    return acc;
+                }, 0);
+                tableRows.push([categoria.replace("_", " "), mes, "Total", cantidad || 0]);
+            });
+        });
+
+        [1, 2, 3, 4, 5].forEach((semana) => {
+            categorias.forEach((categoria) => {
+                const cantidad = comisos[categoria]?.reduce((acc, item) => {
+                    if (item.mes?.toLowerCase() === mes.toLowerCase()) {
+                        const key = `semana_${semana}`;
+                        if (item[key] !== undefined) {
+                            return acc + parseFloat(item[key] || 0);
+                        }
+                    }
+                    return acc;
+                }, 0);
+                tableRows.push([categoria.replace("_", " "), mes, `Semana ${semana}`, cantidad || 0]);
+            });
+        });
+
+        // Añadir la tabla al PDF
+        doc.autoTable({
+            head: [tableColumns],
+            body: tableRows,
+            startY: 50,
+            margin: { top: 20, left: 20, right: 20 },
+            theme: "grid",
+        });
+
+        // Descargar el PDF
+        doc.save(`reporte_comisos_${anio}_${mes}.pdf`);
     };
 
     return (
@@ -169,7 +285,23 @@ const Estadisticas = () => {
                                 ))}
                             </select>
                         </div>
-                        
+
+                        {/* Botones de exportación */}
+                        <div className="mb-6 flex justify-between">
+                            <button
+                                onClick={generateCSV}
+                                className="px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600"
+                            >
+                                Exportar Reporte CSV
+                            </button>
+                            <button
+                                onClick={generatePDF}
+                                className="px-6 py-3 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600"
+                            >
+                                Exportar Reporte PDF
+                            </button>
+                        </div>
+
                         {/* Textos explicativos de categorías */}
                         <div className="mb-6 bg-gray-100 p-4 rounded-lg border border-gray-300">
                             <h3 className="text-lg font-semibold text-gray-800">SOBRE LAS CATEGORÍAS:</h3>
@@ -197,7 +329,7 @@ const Estadisticas = () => {
                 {/* Segunda Gráfica */}
                 <div className="flex flex-col items-center justify-start flex-1 p-8 bg-gray-100">
                     <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-7xl">
-                        <h2 className="text-xl font-bold mb-6 text-center">Valores Semanales por Categoría de la gestion seleccionada</h2>
+                        <h2 className="text-xl font-bold mb-6 text-center">Valores Semanales por Categoría de la gestión seleccionada</h2>
 
                         {/* Mes Selector */}
                         <div className="mb-6 flex justify-end">
