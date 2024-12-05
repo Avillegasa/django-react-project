@@ -1,0 +1,14 @@
+/* responsive.css */
+@media (max-width: 768px) {
+    #content {
+        margin: 10px;
+    }
+
+    #header {
+        font-size: 18px;
+    }
+
+    #sidebar {
+        display: none;
+    }
+}
