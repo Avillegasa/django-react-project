@@ -23,3 +23,5 @@ class UserProfileAdmin(UserAdmin):
     )
 
 admin.site.register(UserProfile, UserProfileAdmin)
+
+

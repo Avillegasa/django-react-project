@@ -6,41 +6,52 @@ import { UserContext } from "../contexts/UserContext";
 
 const Inventario = () => {
   const { user } = useContext(UserContext);
-  const [comisos, setComisos] = useState({}); // Estado para almacenar los datos obtenidos
+  const [comisos, setComisos] = useState([]); // Asegúrate de que comisos sea un arreglo
   const [filteredData, setFilteredData] = useState([]); // Datos filtrados
   const [loading, setLoading] = useState(true); // Estado de carga
   const [showFilters, setShowFilters] = useState(false); // Mostrar/ocultar filtros
   const [filters, setFilters] = useState({
     detalle: "",
     categoria: "",
+    semana: "",
     mes: "",
     anio: "",
     cantidad: "",
   }); // Estado para filtros
 
-  const [editingComiso, setEditingComiso] = useState(null); // Estado para el comiso que se va a editar
-  const [newCantidad, setNewCantidad] = useState(""); // Nueva cantidad para el comiso
-
+  // Obtener los datos al montar el componente
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchComisos = async () => {
+      
       try {
-        const response = await axios.get("http://127.0.0.1:8000/api/all-comisos/", {
+        const response = await axios.get("http://127.0.0.1:8000/api/comisos/", {
           headers: { Authorization: `Token ${user.token}` },
         });
-        setComisos(response.data); // Guardar los datos en el estado
-        setFilteredData(response.data); // Inicialmente, mostrar todos los datos
+
+        
+
+        const { operacion_general, mercaderia, vehiculo, incinerado, grua } = response.data;
+        
+        const allComisos = [
+          ...operacion_general.map((item) => ({ ...item, categoria: "Operación General" })),
+          ...mercaderia.map((item) => ({ ...item, categoria: "Mercadería" })),
+          ...vehiculo.map((item) => ({ ...item, categoria: "Vehículo" })),
+          ...incinerado.map((item) => ({ ...item, categoria: "Incinerado" })),
+          ...grua.map((item) => ({ ...item, categoria: "Grúa" })),
+        ];
+        setComisos(allComisos);
+        setFilteredData(allComisos);
+        setLoading(false);
       } catch (error) {
-        console.error("Error al obtener los datos:", error);
-      } finally {
-        setLoading(false); // Finalizar el estado de carga
+        
+        setLoading(false);
       }
     };
 
-    if (user) {
-      fetchData();
-    }
-  }, [user]);
+    fetchComisos();
+  }, [user.token]);
 
+  // Manejar cambios en los filtros
   const handleFilterChange = (e) => {
     setFilters({
       ...filters,
@@ -48,64 +59,38 @@ const Inventario = () => {
     });
   };
 
+  // Aplicar los filtros
   const applyFilters = () => {
-    const filtered = {};
-    Object.entries(comisos).forEach(([category, items]) => {
-      const filteredItems = items.filter((item) => {
-        const matchesDetalle = filters.detalle
-          ? item.detalle_operacion
-              ?.toLowerCase()
-              .includes(filters.detalle.toLowerCase())
-          : true;
-        const matchesCategoria = filters.categoria
-          ? category.toLowerCase().includes(filters.categoria.toLowerCase())
-          : true;
-        const matchesMes = filters.mes ? item.mes === filters.mes : true;
-        const matchesAnio = filters.anio ? item.anio == filters.anio : true;
-        const matchesCantidad = filters.cantidad
-          ? item.cantidad == filters.cantidad
-          : true;
+    const filtered = comisos.filter((item) => {
+      const matchesDetalle = filters.detalle
+        ? item.detalle_operacion?.toLowerCase().includes(filters.detalle.toLowerCase())
+        : true;
+      const matchesCategoria = filters.categoria
+        ? item.categoria?.toLowerCase().includes(filters.categoria.toLowerCase())
+        : true;
+      const matchesSemana = filters.semana
+        ? item.semana === filters.semana
+        : true;
+      const matchesMes = filters.mes ? item.mes === filters.mes : true;
+      const matchesAnio = filters.anio ? item.anio == filters.anio : true;
+      const matchesCantidad = filters.cantidad
+        ? item.cantidad == filters.cantidad
+        : true;
 
-        return (
-          matchesDetalle &&
-          matchesCategoria &&
-          matchesMes &&
-          matchesAnio &&
-          matchesCantidad
-        );
-      });
-
-      if (filteredItems.length > 0) {
-        filtered[category] = filteredItems;
-      }
+      return (
+        matchesDetalle &&
+        matchesCategoria &&
+        matchesSemana &&
+        matchesMes &&
+        matchesAnio &&
+        matchesCantidad
+      );
     });
+
     setFilteredData(filtered);
   };
 
-  const handleEdit = (item) => {
-    setEditingComiso(item);
-    setNewCantidad(item.cantidad); // Inicializar con la cantidad actual del comiso
-  };
-
-  const handleSave = () => {
-    // Guardar la nueva cantidad
-    if (editingComiso && newCantidad) {
-      const updatedComisos = { ...comisos };
-      Object.entries(updatedComisos).forEach(([category, items]) => {
-        const comisoIndex = items.findIndex((comiso) => comiso.id === editingComiso.id);
-        if (comisoIndex !== -1) {
-          updatedComisos[category][comisoIndex].cantidad = newCantidad;
-        }
-      });
-      setComisos(updatedComisos); // Actualizar los comisos con la nueva cantidad
-      setEditingComiso(null); // Cerrar el formulario de edición
-    }
-  };
-
-  const handleClose = () => {
-    setEditingComiso(null); // Cerrar el formulario de edición sin cambios
-  };
-
+  // Redirigir si el usuario no está autenticado
   if (!user) {
     return <Navigate to="/" />;
   }
@@ -160,6 +145,14 @@ const Inventario = () => {
                 />
                 <input
                   type="text"
+                  name="semana"
+                  value={filters.semana}
+                  onChange={handleFilterChange}
+                  placeholder="Semana"
+                  className="p-2 border rounded-md"
+                />
+                <input
+                  type="text"
                   name="mes"
                   value={filters.mes}
                   onChange={handleFilterChange}
@@ -191,13 +184,12 @@ const Inventario = () => {
               </div>
             </div>
           )}
-
           {/* Mostrar datos */}
           <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-7xl">
             <h2 className="text-2xl font-bold mb-6">Datos de Inventario</h2>
             {loading ? (
               <p className="text-center">Cargando datos...</p>
-            ) : Object.keys(filteredData).length === 0 ? (
+            ) : filteredData.length === 0 ? (
               <p className="text-center">No hay datos disponibles.</p>
             ) : (
               <div className="overflow-x-auto">
@@ -209,66 +201,24 @@ const Inventario = () => {
                       <th className="px-6 py-4 border-b">Mes</th>
                       <th className="px-6 py-4 border-b">Año</th>
                       <th className="px-6 py-4 border-b">Cantidad</th>
-                      <th className="px-6 py-4 border-b">Acciones</th>
                     </tr>
                   </thead>
                   <tbody>
-                    {Object.entries(filteredData).map(([category, items]) =>
-                      items.map((item) => (
-                        <tr key={item.id}>
-                          <td className="px-6 py-4 border-t capitalize">{category.replace("_", " ")}</td>
-                          <td className="px-6 py-4 border-t">{item.detalle_operacion || "N/A"}</td>
-                          <td className="px-6 py-4 border-t">{item.mes || "N/A"}</td>
-                          <td className="px-6 py-4 border-t">{item.anio || "N/A"}</td>
-                          <td className="px-6 py-4 border-t">{item.cantidad || "N/A"}</td>
-                          <td className="px-6 py-4 border-t">
-                            <button
-                              onClick={() => handleEdit(item)}
-                              className="bg-[#2980B9] text-white px-4 py-2 rounded-md hover:bg-[#1F618D]"
-                            >
-                              Editar
-                            </button>
-                          </td>
-                        </tr>
-                      ))
-                    )}
+                    {filteredData.map((item, index) => (
+                    <tr key={index} className="border-b hover:bg-gray-50">
+                      <td className="px-6 py-4">{item.categoria}</td>
+                      <td className="px-6 py-4">{item.detalle}</td>
+                      <td className="px-6 py-4">{item.mes}</td>
+                      <td className="px-6 py-4">{item.anio}</td>
+                      <td className="px-6 py-4">{item.cantidad}</td>
+                    </tr>
+                    ))}
                   </tbody>
+
                 </table>
               </div>
             )}
           </div>
-
-          {/* Modal de Edición */}
-          {editingComiso && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-              <div className="bg-white p-6 rounded-lg shadow-lg w-96">
-                <h3 className="text-2xl font-bold mb-4">Editar Comiso</h3>
-                <div className="mb-4">
-                  <label className="block text-lg mb-2">Cantidad</label>
-                  <input
-                    type="number"
-                    value={newCantidad}
-                    onChange={(e) => setNewCantidad(e.target.value)}
-                    className="w-full p-2 border border-gray-300 rounded-md"
-                  />
-                </div>
-                <div className="flex justify-end space-x-4">
-                  <button
-                    onClick={handleSave}
-                    className="bg-[#27AE60] text-white px-4 py-2 rounded-md hover:bg-[#1E8449]"
-                  >
-                    Guardar
-                  </button>
-                  <button
-                    onClick={handleClose}
-                    className="bg-[#E74C3C] text-white px-4 py-2 rounded-md hover:bg-[#C0392B]"
-                  >
-                    Cerrar
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
         </div>
       </div>
     </div>

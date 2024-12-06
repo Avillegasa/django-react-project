@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import path, include
 from django.urls import path
+from django.http import HttpResponseRedirect
 from . import views
 from .views import api_root
 
