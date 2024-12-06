@@ -6,44 +6,54 @@ import { UserContext } from "../contexts/UserContext";
 
 const Inventario = () => {
   const { user } = useContext(UserContext);
-  const [comisos, setComisos] = useState([]); // Asegúrate de que comisos sea un arreglo
+  const [comisos, setComisos] = useState([]); // Datos originales
   const [filteredData, setFilteredData] = useState([]); // Datos filtrados
   const [loading, setLoading] = useState(true); // Estado de carga
   const [showFilters, setShowFilters] = useState(false); // Mostrar/ocultar filtros
   const [filters, setFilters] = useState({
-    detalle: "",
     categoria: "",
     semana: "",
     mes: "",
     anio: "",
-    cantidad: "",
   }); // Estado para filtros
 
   // Obtener los datos al montar el componente
   useEffect(() => {
     const fetchComisos = async () => {
-      
       try {
         const response = await axios.get("http://127.0.0.1:8000/api/comisos/", {
           headers: { Authorization: `Token ${user.token}` },
         });
 
-        
+        const { operacion_general, mercaderia, vehiculo, incinerado, grua } =
+          response.data;
 
-        const { operacion_general, mercaderia, vehiculo, incinerado, grua } = response.data;
-        
         const allComisos = [
-          ...operacion_general.map((item) => ({ ...item, categoria: "Operación General" })),
-          ...mercaderia.map((item) => ({ ...item, categoria: "Mercadería" })),
-          ...vehiculo.map((item) => ({ ...item, categoria: "Vehículo" })),
-          ...incinerado.map((item) => ({ ...item, categoria: "Incinerado" })),
-          ...grua.map((item) => ({ ...item, categoria: "Grúa" })),
+          ...operacion_general.map((item) => ({
+            ...item,
+            categoria: "Operación General",
+          })),
+          ...mercaderia.map((item) => ({
+            ...item,
+            categoria: "Mercadería",
+          })),
+          ...vehiculo.map((item) => ({
+            ...item,
+            categoria: "Vehículo",
+          })),
+          ...incinerado.map((item) => ({
+            ...item,
+            categoria: "Incinerado",
+          })),
+          ...grua.map((item) => ({
+            ...item,
+            categoria: "Grúa",
+          })),
         ];
         setComisos(allComisos);
         setFilteredData(allComisos);
         setLoading(false);
       } catch (error) {
-        
         setLoading(false);
       }
     };
@@ -59,35 +69,23 @@ const Inventario = () => {
     });
   };
 
-  // Aplicar los filtros
-  const applyFilters = () => {
+  // Aplicar filtros dinámicamente
+  useEffect(() => {
     const filtered = comisos.filter((item) => {
-      const matchesDetalle = filters.detalle
-        ? item.detalle_operacion?.toLowerCase().includes(filters.detalle.toLowerCase())
-        : true;
       const matchesCategoria = filters.categoria
-        ? item.categoria?.toLowerCase().includes(filters.categoria.toLowerCase())
-        : true;
-      const matchesSemana = filters.semana
-        ? item.semana === filters.semana
+        ? item.categoria === filters.categoria
         : true;
       const matchesMes = filters.mes ? item.mes === filters.mes : true;
-      const matchesAnio = filters.anio ? item.anio == filters.anio : true;
-      const matchesCantidad = filters.cantidad
-        ? item.cantidad == filters.cantidad
-        : true;
+      const matchesAnio = filters.anio ? item.anio.toString() === filters.anio : true;
 
-      return (
-        matchesDetalle &&
-        matchesCategoria &&
-        matchesSemana &&
-        matchesMes &&
-        matchesAnio &&
-        matchesCantidad
-      );
+      return matchesCategoria && matchesMes && matchesAnio;
     });
-
     setFilteredData(filtered);
+  }, [filters, comisos]);
+
+  // Obtener opciones únicas para los filtros dinámicamente
+  const getUniqueOptions = (key) => {
+    return [...new Set(comisos.map((item) => item[key]))].filter(Boolean);
   };
 
   // Redirigir si el usuario no está autenticado
@@ -127,63 +125,51 @@ const Inventario = () => {
           {showFilters && (
             <div className="bg-white shadow-md rounded-lg p-4 w-full max-w-7xl mb-4">
               <div className="grid grid-cols-3 gap-4">
-                <input
-                  type="text"
-                  name="detalle"
-                  value={filters.detalle}
-                  onChange={handleFilterChange}
-                  placeholder="Detalle Operación"
-                  className="p-2 border rounded-md"
-                />
-                <input
-                  type="text"
+                <select
                   name="categoria"
                   value={filters.categoria}
                   onChange={handleFilterChange}
-                  placeholder="Categoría"
                   className="p-2 border rounded-md"
-                />
-                <input
-                  type="text"
-                  name="semana"
-                  value={filters.semana}
-                  onChange={handleFilterChange}
-                  placeholder="Semana"
-                  className="p-2 border rounded-md"
-                />
-                <input
-                  type="text"
+                >
+                  <option value="">Categoría</option>
+                  {getUniqueOptions("categoria").map((option, index) => (
+                    <option key={index} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+
+                <select
                   name="mes"
                   value={filters.mes}
                   onChange={handleFilterChange}
-                  placeholder="Mes"
                   className="p-2 border rounded-md"
-                />
-                <input
-                  type="text"
+                >
+                  <option value="">Mes</option>
+                  {getUniqueOptions("mes").map((option, index) => (
+                    <option key={index} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+
+                <select
                   name="anio"
                   value={filters.anio}
                   onChange={handleFilterChange}
-                  placeholder="Año"
                   className="p-2 border rounded-md"
-                />
-                <input
-                  type="text"
-                  name="cantidad"
-                  value={filters.cantidad}
-                  onChange={handleFilterChange}
-                  placeholder="Cantidad"
-                  className="p-2 border rounded-md"
-                />
-                <button
-                  onClick={applyFilters}
-                  className="bg-[#3498DB] text-white px-4 py-2 rounded-md hover:bg-[#1F618D]"
                 >
-                  Aplicar Filtros
-                </button>
+                  <option value="">Año</option>
+                  {getUniqueOptions("anio").map((option, index) => (
+                    <option key={index} value={option.toString()}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
               </div>
             </div>
           )}
+
           {/* Mostrar datos */}
           <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-7xl">
             <h2 className="text-2xl font-bold mb-6">Datos de Inventario</h2>
@@ -205,16 +191,15 @@ const Inventario = () => {
                   </thead>
                   <tbody>
                     {filteredData.map((item, index) => (
-                    <tr key={index} className="border-b hover:bg-gray-50">
-                      <td className="px-6 py-4">{item.categoria}</td>
-                      <td className="px-6 py-4">{item.detalle}</td>
-                      <td className="px-6 py-4">{item.mes}</td>
-                      <td className="px-6 py-4">{item.anio}</td>
-                      <td className="px-6 py-4">{item.cantidad}</td>
-                    </tr>
+                      <tr key={index} className="border-b hover:bg-gray-50">
+                        <td className="px-6 py-4">{item.categoria}</td>
+                        <td className="px-6 py-4">{item.detalle}</td>
+                        <td className="px-6 py-4">{item.mes}</td>
+                        <td className="px-6 py-4">{item.anio}</td>
+                        <td className="px-6 py-4">{item.cantidad}</td>
+                      </tr>
                     ))}
                   </tbody>
-
                 </table>
               </div>
             )}
